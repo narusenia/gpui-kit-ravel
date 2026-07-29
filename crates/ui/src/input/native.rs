@@ -1,6 +1,13 @@
 #[cfg(target_os = "macos")]
 mod macos {
-    use std::{cell::RefCell, collections::HashMap, mem, ptr, sync::Once};
+    use std::{
+        cell::RefCell,
+        collections::HashMap,
+        mem,
+        panic::{AssertUnwindSafe, catch_unwind},
+        ptr,
+        sync::Once,
+    };
 
     use gpui::Window;
     use objc2::{
@@ -48,8 +55,16 @@ mod macos {
     }
 
     fn ns_view(window: &Window) -> Option<&AnyObject> {
-        let handle = HasWindowHandle::window_handle(window).ok()?;
-        let RawWindowHandle::AppKit(handle) = handle.as_raw() else {
+        // GPUI-CE's headless TestWindow intentionally panics when asked for a
+        // native handle. Content types are platform metadata, so skip them in
+        // headless tests while preserving normal AppKit behavior.
+        let handle = catch_unwind(AssertUnwindSafe(|| {
+            HasWindowHandle::window_handle(window)
+                .ok()
+                .map(|handle| handle.as_raw())
+        }))
+        .ok()??;
+        let RawWindowHandle::AppKit(handle) = handle else {
             return None;
         };
 
