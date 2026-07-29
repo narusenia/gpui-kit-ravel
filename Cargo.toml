@@ -128,3 +128,9 @@ ignored = ["log", "anyhow", "serde"]
 [patch.crates-io]
 # Use stacker's psm version which may have better WASM support
 psm = { git = "https://github.com/rust-lang/stacker", branch = "master" }
+
+# The gpui-ce compatibility branch is tested against GPUI-CE directly. Keep
+# the dependency declarations aligned with upstream so main can still be
+# merged, and replace Zed's GPUI family at resolution time.
+[patch."https://github.com/zed-industries/zed"]
+gpui = { git = "https://github.com/gpui-ce/gpui-ce", rev = "c1faa21ced1cd62c9509f7b7762c38cf971d4aa6" }

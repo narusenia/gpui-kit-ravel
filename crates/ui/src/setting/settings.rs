@@ -10,8 +10,7 @@ use crate::{
 };
 use gpui::{
     App, AppContext as _, Axis, ElementId, Entity, IntoElement, ParentElement as _, Pixels,
-    RenderOnce, StyleRefinement, Styled, Window, container_query, div, prelude::FluentBuilder as _,
-    px, relative,
+    RenderOnce, StyleRefinement, Styled, Window, div, prelude::FluentBuilder as _, px, relative,
 };
 use rust_i18n::t;
 
@@ -297,6 +296,18 @@ impl RenderOnce for Settings {
             disabled: false,
         };
         let sidebar_size_range = self.sidebar_size_range.clone();
+        // GPUI-CE does not yet expose Zed GPUI's `container_query` element.
+        // The settings body is the window minus the sidebar, so use that
+        // effective width to preserve the responsive stacked layout.
+        let content_width = window.bounds().size.width - self.sidebar_width;
+        let options = RenderOptions {
+            layout: if content_width <= STACKED_LAYOUT_MAX_WIDTH {
+                Axis::Vertical
+            } else {
+                Axis::Horizontal
+            },
+            ..options
+        };
         let sidebar = self
             .render_sidebar(&state, &filtered_pages, window, cx)
             .into_any_element();
@@ -308,18 +319,12 @@ impl RenderOnce for Settings {
                     .size_range(sidebar_size_range)
                     .child(sidebar),
             )
-            .child(
-                resizable_panel().child(container_query(move |size, window, cx| {
-                    let options = RenderOptions {
-                        layout: if size.width <= STACKED_LAYOUT_MAX_WIDTH {
-                            Axis::Vertical
-                        } else {
-                            Axis::Horizontal
-                        },
-                        ..options
-                    };
-                    self.render_active_page(&state, &filtered_pages, &options, window, cx)
-                })),
-            )
+            .child(resizable_panel().child(self.render_active_page(
+                &state,
+                &filtered_pages,
+                &options,
+                window,
+                cx,
+            )))
     }
 }
