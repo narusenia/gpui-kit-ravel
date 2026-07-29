@@ -40,7 +40,14 @@ extern "C" fn hit_test_forwarder(this: &NSWindow, _cmd: Sel, point: NSPoint) -> 
 }
 
 fn ns_view(window: &Window) -> Option<&NSView> {
-    let handle = HasWindowHandle::window_handle(window).ok()?;
+    // GPUI's headless TestWindow deliberately panics when asked for a native
+    // handle. Accessibility metadata is irrelevant there, so treat it like a
+    // platform without an AppKit handle.
+    let handle = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        HasWindowHandle::window_handle(window)
+    }))
+    .ok()?
+    .ok()?;
     let RawWindowHandle::AppKit(handle) = handle.as_raw() else {
         return None;
     };
