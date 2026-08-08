@@ -13,7 +13,9 @@ use gpui::{
     deferred, div, prelude::FluentBuilder, px,
 };
 
-const CONTEXT: &str = "AppMenuBar";
+/// Key context of the [`AppMenuBar`]. Public for the same reason as
+/// [`super::POPUP_MENU_CONTEXT`].
+pub const CONTEXT: &str = "AppMenuBar";
 pub fn init(cx: &mut App) {
     cx.bind_keys([
         KeyBinding::new("escape", Cancel, Some(CONTEXT)),

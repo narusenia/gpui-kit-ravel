@@ -93,6 +93,25 @@ where
             .trigger(self.trigger)
             .trigger_style(self.style)
             .anchor(self.anchor)
+            .on_open_change({
+                // Drop the cached menu whenever the popover closes, so the next
+                // open takes the build-and-focus path below.
+                //
+                // Without this, only a `DismissEvent` from the menu itself
+                // cleared the cache. Closing any other way (the trigger again,
+                // a click outside) left it, so the next open reused a menu that
+                // nothing focused — `Popover::toggle_open` focuses its own
+                // handle, not the menu's. The reopened menu then answered to no
+                // key at all: no arrows, no Enter, no Escape.
+                let menu_state = menu_state.clone();
+                move |open, _window, cx| {
+                    if !*open {
+                        menu_state.update(cx, |state, _| {
+                            state.menu = None;
+                        });
+                    }
+                }
+            })
             .content(move |_, window, cx| {
                 // Here is special logic to only create the PopupMenu once and reuse it.
                 // Because this `content` will called in every time render, so we need to store the menu

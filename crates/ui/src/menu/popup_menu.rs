@@ -14,7 +14,11 @@ use gpui::{ClickEvent, Half, MouseDownEvent, OwnedMenuItem, Point, Subscription}
 
 use std::rc::Rc;
 
-const CONTEXT: &str = "PopupMenu";
+/// Key context of an open [`PopupMenu`].
+///
+/// Public so a host can write a binding predicate that yields to an open menu
+/// instead of repeating the string.
+pub const CONTEXT: &str = "PopupMenu";
 
 pub fn init(cx: &mut App) {
     cx.bind_keys([
