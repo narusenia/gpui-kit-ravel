@@ -48,13 +48,17 @@ gpui-wry = { path = "crates/webview", version = "0.6.0" }
 gpui-component-shell = { path = "crates/component-shell", version = "0.6.0" }
 story = { path = "crates/story" }
 
-gpui = { package = "gpui-pre", version = "0.3.1" }
-gpui_platform = { package = "gpui-pre-platform", version = "0.3.1", features = ["font-kit", "x11", "wayland", "runtime_shaders"] }
-gpui_web = { package = "gpui-pre-web", version = "0.3.1" }
-gpui_macros = { package = "gpui-pre-macros", version = "0.3.1" }
-reqwest_client = { package = "gpui-pre-reqwest-client", version = "0.3.1" }
-sum-tree = { package = "gpui-pre-sum-tree", version = "0.3.1" }
-reqwest = { package = "gpui-pre-reqwest", version = "0.12.15", default-features = false, features = [
+# The `gpui` family comes from the gpui-ce fork carrying Ravel's patches.
+# Pinned by rev, not branch: the branch still moves.
+gpui = { package = "gpui-ce", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
+gpui_platform = { package = "gpui_ce_platform", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7", features = ["font-kit", "x11", "wayland", "runtime_shaders"] }
+gpui_web = { package = "gpui_ce_web", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
+gpui_macros = { package = "gpui_ce_macros", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
+sum-tree = { package = "gpui_ce_sum_tree", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
+# gpui-ce ships no reqwest-backed `HttpClient`, so `reqwest_client` has no
+# counterpart here; keeping the gpui-pre one would hand `App` a `HttpClient`
+# from the wrong crate. Consumers that need one supply it themselves.
+reqwest = { version = "0.12.15", default-features = false, features = [
     "charset",
     "http2",
     "macos-system-configuration",
@@ -127,14 +131,13 @@ rustybuzz = { opt-level = 3 }
 taffy = { opt-level = 3 }
 ttf-parser = { opt-level = 3 }
 smol = { opt-level = 3 }
-gpui-pre = { opt-level = 3 }
-gpui-pre-platform = { opt-level = 3 }
-gpui-pre-macros = { opt-level = 3 }
+gpui-ce = { opt-level = 3 }
+gpui_ce_platform = { opt-level = 3 }
+gpui_ce_macros = { opt-level = 3 }
 tree-sitter = { opt-level = 3 }
-gpui-pre-sum-tree = { opt-level = 3 }
+gpui_ce_sum_tree = { opt-level = 3 }
 ropey = { opt-level = 3 }
 lsp-types = { opt-level = 3 }
-gpui-pre-reqwest-client = { opt-level = 3 }
 markdown = { opt-level = 3 }
 xml5ever = { opt-level = 3 }
 # `rquickjs` is a facade that re-exports `rquickjs-core`, so naming it alone
