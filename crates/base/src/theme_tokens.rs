@@ -4,7 +4,7 @@
 //! contain component names such as `button`, `table`, or `sidebar`.
 
 use gpui::{BoxShadow, FontWeight, Hsla, Pixels, SharedString, hsla, point, px, rgb};
-use schemars::JsonSchema;
+use schemars::{JsonSchema, json_schema};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -18,22 +18,39 @@ pub struct SemanticThemeTokens {
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct ColorTokens {
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub background: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub foreground: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub surface: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub surface_foreground: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub primary: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub primary_foreground: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub secondary: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub secondary_foreground: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub muted: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub muted_foreground: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub accent: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub accent_foreground: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub destructive: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub destructive_foreground: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub border: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub input: Hsla,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub ring: Hsla,
     /// Background painted behind selected text.
     ///
@@ -41,6 +58,7 @@ pub struct ColorTokens {
     /// wash that leaves the text legible. It carries a serde default so
     /// palettes written before the token existed still load.
     #[serde(default = "ColorTokens::default_selection")]
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub selection: Hsla,
 }
 
@@ -189,9 +207,37 @@ impl Default for TypographyTokens {
 
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct ShadowTokens {
+    #[schemars(schema_with = "box_shadows_schemar")]
     pub sm: Vec<BoxShadow>,
+    #[schemars(schema_with = "box_shadows_schemar")]
     pub md: Vec<BoxShadow>,
+    #[schemars(schema_with = "box_shadows_schemar")]
     pub lg: Vec<BoxShadow>,
+}
+
+/// Schema for `Vec<BoxShadow>`.
+///
+/// `gpui::BoxShadow` carries no `JsonSchema` impl of its own, so its shape is
+/// spelled out here the same way gpui spells out `Hsla`'s.
+fn box_shadows_schemar(generator: &mut schemars::SchemaGenerator) -> schemars::Schema {
+    let color = gpui::hsla_schemar(generator);
+    let pixels = json_schema!({ "type": "number", "format": "float" });
+    json_schema!({
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "color": color,
+                "offset": {
+                    "type": "object",
+                    "properties": { "x": pixels, "y": pixels },
+                },
+                "blur_radius": pixels,
+                "spread_radius": pixels,
+                "inset": { "type": "boolean" },
+            },
+        },
+    })
 }
 
 impl ShadowTokens {
