@@ -4,6 +4,7 @@
 //! arithmetic, the undo stack, the zoom flag — and draws none of it. The tile
 //! frame, its title bar and its resize affordances are here.
 
+use gpui::ColorExt as _;
 use std::rc::Rc;
 
 use gpui::{

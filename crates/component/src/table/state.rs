@@ -1,3 +1,4 @@
+use gpui::ColorExt as _;
 use std::{ops::Range, rc::Rc, time::Duration};
 
 use crate::{
