@@ -232,12 +232,9 @@ pub fn init(cx: &mut App) {
     themes::init(cx);
     stories::init(cx);
 
-    #[cfg(not(target_family = "wasm"))]
-    {
-        let http_client =
-            reqwest_client::ReqwestClient::user_agent("gpui-component/story").unwrap();
-        cx.set_http_client(std::sync::Arc::new(http_client));
-    }
+    // gpui-ce ships no reqwest-backed `HttpClient`, so the app keeps gpui's
+    // default `NullHttpClient` and the stories that show a remote image render
+    // nothing until a host supplies a client of its own.
 
     cx.bind_keys([
         KeyBinding::new("/", ToggleSearch, None),
