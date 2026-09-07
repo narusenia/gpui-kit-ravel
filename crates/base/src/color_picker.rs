@@ -30,7 +30,7 @@ pub(crate) fn init(cx: &mut App) {
 }
 
 /// Parses `#rgb`, `#rgba`, `#rrggbb`, and `#rrggbbaa`, with or without the `#`.
-fn parse_hex(value: &str) -> Option<Hsla> {
+pub(crate) fn parse_hex(value: &str) -> Option<Hsla> {
     let value = value.strip_prefix('#').unwrap_or(value);
     // `from_str_radix` accepts a leading sign, so reject anything that is not
     // purely hexadecimal before slicing components out of it.
@@ -54,35 +54,32 @@ fn parse_hex(value: &str) -> Option<Hsla> {
         Some(raw as f32 / 255.0)
     };
 
-    Some(
-        Rgba {
-            r: component(0)?,
-            g: component(1)?,
-            b: component(2)?,
-            a: if has_alpha { component(3)? } else { 1.0 },
-        }
-        .into(),
-    )
+    Some(gpui::rgb_to_hsla(Rgba::new(
+        component(0)?,
+        component(1)?,
+        component(2)?,
+        if has_alpha { component(3)? } else { 1.0 },
+    )))
 }
 
 /// Formats a color as `#RRGGBB`, or `#RRGGBBAA` when it is translucent.
 fn hex_string(color: Hsla) -> String {
-    let rgba = Rgba::from(color);
+    let rgba = gpui::hsla_to_rgba(color);
     let channel = |value: f32| (value * 255.) as u32;
-    if rgba.a < 1. {
+    if rgba.alpha < 1. {
         format!(
             "#{:02X}{:02X}{:02X}{:02X}",
-            channel(rgba.r),
-            channel(rgba.g),
-            channel(rgba.b),
-            channel(rgba.a)
+            channel(rgba.red),
+            channel(rgba.green),
+            channel(rgba.blue),
+            channel(rgba.alpha)
         )
     } else {
         format!(
             "#{:02X}{:02X}{:02X}",
-            channel(rgba.r),
-            channel(rgba.g),
-            channel(rgba.b)
+            channel(rgba.red),
+            channel(rgba.green),
+            channel(rgba.blue)
         )
     }
 }
