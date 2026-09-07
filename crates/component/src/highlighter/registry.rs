@@ -1,4 +1,4 @@
-use gpui::{App, FontWeight, HighlightStyle, Hsla, SharedString};
+use gpui::{App, ColorExt as _, FontWeight, HighlightStyle, Hsla, SharedString};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -368,8 +368,10 @@ impl StatusColors {
     #[inline]
     pub fn error_background(&self, cx: &App) -> Hsla {
         let bg = cx.theme().background;
-        self.error_background
-            .unwrap_or(bg.blend(self.error(cx).alpha(0.2)))
+        self.error_background.unwrap_or(bg.blend(&Hsla {
+            alpha: 0.2,
+            ..self.error(cx)
+        }))
     }
 
     #[inline]
@@ -385,8 +387,10 @@ impl StatusColors {
     #[inline]
     pub fn warning_background(&self, cx: &App) -> Hsla {
         let bg = cx.theme().background;
-        self.warning_background
-            .unwrap_or(bg.blend(self.warning(cx).alpha(0.2)))
+        self.warning_background.unwrap_or(bg.blend(&Hsla {
+            alpha: 0.2,
+            ..self.warning(cx)
+        }))
     }
 
     #[inline]
@@ -402,8 +406,10 @@ impl StatusColors {
     #[inline]
     pub fn info_background(&self, cx: &App) -> Hsla {
         let bg = cx.theme().background;
-        self.info_background
-            .unwrap_or(bg.blend(self.info(cx).alpha(0.2)))
+        self.info_background.unwrap_or(bg.blend(&Hsla {
+            alpha: 0.2,
+            ..self.info(cx)
+        }))
     }
 
     #[inline]
@@ -419,8 +425,10 @@ impl StatusColors {
     #[inline]
     pub fn success_background(&self, cx: &App) -> Hsla {
         let bg = cx.theme().background;
-        self.success_background
-            .unwrap_or(bg.blend(self.success(cx).alpha(0.2)))
+        self.success_background.unwrap_or(bg.blend(&Hsla {
+            alpha: 0.2,
+            ..self.success(cx)
+        }))
     }
 
     #[inline]
@@ -436,8 +444,10 @@ impl StatusColors {
     #[inline]
     pub fn hint_background(&self, cx: &App) -> Hsla {
         let bg = cx.theme().background;
-        self.hint_background
-            .unwrap_or(bg.blend(self.hint(cx).alpha(0.2)))
+        self.hint_background.unwrap_or(bg.blend(&Hsla {
+            alpha: 0.2,
+            ..self.hint(cx)
+        }))
     }
 
     #[inline]
