@@ -1,5 +1,5 @@
 use gpui_kit::component::{
-    ActiveTheme as _, Icon, IconName, Sizable as _, StyledExt as _, WindowExt as _,
+    ActiveTheme as _, Colorize as _, Icon, IconName, Sizable as _, StyledExt as _, WindowExt as _,
     attachment::{
         Attachment, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentGroup,
         AttachmentMedia, AttachmentStatus, AttachmentTitle,

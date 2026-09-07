@@ -1,5 +1,5 @@
 use gpui_kit::component::{
-    ActiveTheme, Colorize as _, StyledExt, WindowExt,
+    ActiveTheme, Colorize, StyledExt, WindowExt,
     button::Button,
     clipboard::Clipboard,
     h_flex,
@@ -241,7 +241,7 @@ impl Render for SliderStory {
                             .gap_4()
                             .p_4()
                             .rounded(cx.theme().radius_lg)
-                            .bg(cx.theme().muted.opacity(0.4))
+                            .bg(Colorize::opacity(&cx.theme().muted, 0.4))
                             .child(
                                 h_flex()
                                     .items_center()
@@ -320,12 +320,10 @@ impl Render for SliderStory {
                                     .vertical()
                                     .disabled(self.disabled),
                             )
-                            .child(
-                                v_flex()
-                                    .items_center()
-                                    .child("Hue")
-                                    .child(format!("{:.0}", self.slider_hsl_value.h * 360.)),
-                            ),
+                            .child(v_flex().items_center().child("Hue").child(format!(
+                                "{:.0}",
+                                self.slider_hsl_value.hue.into_positive_degrees()
+                            ))),
                     )
                     .child(
                         v_flex()
@@ -339,10 +337,10 @@ impl Render for SliderStory {
                                     .disabled(self.disabled),
                             )
                             .child(
-                                v_flex()
-                                    .items_center()
-                                    .child("Saturation")
-                                    .child(format!("{:.0}", self.slider_hsl_value.s * 100.)),
+                                v_flex().items_center().child("Saturation").child(format!(
+                                    "{:.0}",
+                                    self.slider_hsl_value.saturation * 100.
+                                )),
                             ),
                     )
                     .child(
@@ -357,10 +355,10 @@ impl Render for SliderStory {
                                     .disabled(self.disabled),
                             )
                             .child(
-                                v_flex()
-                                    .items_center()
-                                    .child("Lightness")
-                                    .child(format!("{:.0}", self.slider_hsl_value.l * 100.)),
+                                v_flex().items_center().child("Lightness").child(format!(
+                                    "{:.0}",
+                                    self.slider_hsl_value.lightness * 100.
+                                )),
                             ),
                     )
                     .child(
@@ -378,7 +376,7 @@ impl Render for SliderStory {
                                 v_flex()
                                     .items_center()
                                     .child("Alpha")
-                                    .child(format!("{:.0}", self.slider_hsl_value.a * 100.)),
+                                    .child(format!("{:.0}", self.slider_hsl_value.alpha * 100.)),
                             ),
                     ),
             )

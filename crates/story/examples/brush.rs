@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use gpui_kit::assets::Assets;
 use gpui_kit::component::{
-    ActiveTheme, Colorize as _, ElementExt, IconName, Sizable,
+    ActiveTheme, Colorize, ElementExt, IconName, Sizable,
     button::Button,
     checkbox::Checkbox,
     group_box::{GroupBox, GroupBoxVariants as _},
@@ -72,7 +72,7 @@ impl BrushStory {
             self.is_drawing = true;
             let brush_size = self.brush_size.read(cx).value().start();
             let brush_opacity = self.brush_opacity.read(cx).value().start();
-            let color = self.brush_color.opacity(brush_opacity);
+            let color = Colorize::opacity(&self.brush_color, brush_opacity);
 
             let local_pos = if let Some(bounds) = self.canvas_bounds {
                 Point::new(
@@ -212,9 +212,13 @@ impl BrushStory {
             .on_mouse_down(MouseButton::Left, cx.listener(Self::handle_mouse_down))
             .on_mouse_move(cx.listener(Self::handle_mouse_move))
             .on_mouse_up(MouseButton::Left, cx.listener(Self::handle_mouse_up))
-            .on_prepaint(move |bounds, _window, cx| {
-                state_entity.update(cx, |state, _| {
-                    state.canvas_bounds = Some(bounds);
+            // `Stateful` now carries gpui's own `on_prepaint`, so name the
+            // one the kit means.
+            .map(|this| {
+                ElementExt::on_prepaint(this, move |bounds, _window, cx| {
+                    state_entity.update(cx, |state, _| {
+                        state.canvas_bounds = Some(bounds);
+                    })
                 })
             });
 
@@ -237,7 +241,7 @@ impl BrushStory {
                     let size = prepaint_bounds.size;
 
                     if show_grid {
-                        let grid_color = theme.border.opacity(0.2);
+                        let grid_color = Colorize::opacity(&theme.border, 0.2);
                         let grid_size = 40.0;
 
                         let mut x = 0.0;

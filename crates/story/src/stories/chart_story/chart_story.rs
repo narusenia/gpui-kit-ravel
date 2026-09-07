@@ -1,5 +1,5 @@
 use gpui_kit::component::{
-    ActiveTheme, StyledExt,
+    ActiveTheme, Colorize as _, StyledExt,
     chart::{
         AreaChart, BarChart, CandlestickChart, LineChart, PieChart, RadarChart, SankeyChart,
         SankeyLabel,
@@ -12,8 +12,8 @@ use gpui_kit::component::{
 };
 use gpui_kit::{
     App, AppContext, Context, Entity, FocusHandle, Focusable, FontWeight, Hsla, IntoElement,
-    ParentElement, Render, Rgba, SharedString, Styled, Window, div, linear_color_stop,
-    linear_gradient, prelude::FluentBuilder, px,
+    ParentElement, Render, SharedString, Styled, Window, div, linear_color_stop, linear_gradient,
+    prelude::FluentBuilder, px,
 };
 use serde::Deserialize;
 
@@ -29,7 +29,10 @@ struct MonthlyDevice {
 
 impl MonthlyDevice {
     pub fn color(&self, color: Hsla) -> Hsla {
-        color.alpha(self.color_alpha)
+        Hsla {
+            alpha: self.color_alpha,
+            ..color
+        }
     }
 }
 
@@ -147,9 +150,8 @@ impl ChartStory {
                         name: node.name.clone(),
                         value: node.value.parse().unwrap_or(0.),
                         growth: node.growth.parse().ok(),
-                        color: Rgba::try_from(node.color.as_ref())
-                            .map(Into::into)
-                            .unwrap_or(gpui_kit::black()),
+                        // gpui-ce parses no hex on `Rgba`; `Colorize` does.
+                        color: Hsla::parse_hex(node.color.as_ref()).unwrap_or(gpui_kit::black()),
                     })
                     .collect();
                 // Skip links with unknown node keys or unparsable values
@@ -682,11 +684,17 @@ impl Render for ChartStory {
                                         |x: f32, y: f32| -> f32 { (x * w + (h - y) * h) / denom };
                                     let lo = project(bar.origin.x, bar.origin.y + bar.size.height);
                                     let hi = project(bar.origin.x + bar.size.width, bar.origin.y);
-                                    let lerp = |t: f32| Hsla {
-                                        h: c1.h + (c2.h - c1.h) * t,
-                                        s: c1.s + (c2.s - c1.s) * t,
-                                        l: c1.l + (c2.l - c1.l) * t,
-                                        a: c1.a + (c2.a - c1.a) * t,
+                                    // `hsla()` takes the hue as a 0..1
+                                    // fraction of the circle; `Hsla` stores
+                                    // degrees.
+                                    let turns = |c: &Hsla| c.hue.into_positive_degrees() / 360.;
+                                    let lerp = |t: f32| {
+                                        gpui_kit::hsla(
+                                            turns(&c1) + (turns(&c2) - turns(&c1)) * t,
+                                            c1.saturation + (c2.saturation - c1.saturation) * t,
+                                            c1.lightness + (c2.lightness - c1.lightness) * t,
+                                            c1.alpha + (c2.alpha - c1.alpha) * t,
+                                        )
                                     };
                                     linear_gradient(
                                         45.,

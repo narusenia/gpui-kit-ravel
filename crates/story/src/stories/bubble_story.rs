@@ -1,5 +1,5 @@
 use gpui_kit::component::{
-    ActiveTheme as _, IconName, Sizable as _, StyledExt as _,
+    ActiveTheme as _, Colorize as _, IconName, Sizable as _, StyledExt as _,
     bubble::{
         Bubble, BubbleContent, BubbleGroup, BubbleReactionSide, BubbleReactions, BubbleVariant,
     },

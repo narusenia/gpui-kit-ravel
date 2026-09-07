@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use gpui_kit::component::{
-    ActiveTheme, Icon, IconName, Sizable, StyledExt,
+    ActiveTheme, Colorize as _, Icon, IconName, Sizable, StyledExt,
     avatar::Avatar,
     button::{Button, ButtonVariants},
     checkbox::Checkbox,

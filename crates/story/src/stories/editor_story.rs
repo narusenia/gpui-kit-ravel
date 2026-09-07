@@ -4,7 +4,8 @@ use gpui_kit::{
 };
 
 use gpui_kit::component::{
-    ActiveTheme, button::Button, h_flex, input::*, menu::PopupMenuItem, tab::TabBar, v_flex,
+    ActiveTheme, Colorize as _, button::Button, h_flex, input::*, menu::PopupMenuItem, tab::TabBar,
+    v_flex,
 };
 
 use crate::story_toolbar_group;
