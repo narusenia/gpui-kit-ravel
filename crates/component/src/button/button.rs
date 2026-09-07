@@ -32,7 +32,7 @@ impl From<Pixels> for ButtonRounded {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub struct ButtonCustomVariant {
     color: Hsla,
     foreground: Hsla,
@@ -138,7 +138,7 @@ impl ButtonCustomVariant {
 }
 
 /// The variant of the Button.
-#[derive(Clone, Copy, PartialEq, Eq, Default, Debug)]
+#[derive(Clone, Copy, PartialEq, Default, Debug)]
 pub enum ButtonVariant {
     #[default]
     Default,

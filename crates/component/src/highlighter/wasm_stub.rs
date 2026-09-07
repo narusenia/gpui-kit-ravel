@@ -127,7 +127,7 @@ pub enum FontWeightContent {
     Black = 900,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct ThemeStyle {
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub color: Option<gpui::Hsla>,
@@ -160,7 +160,7 @@ impl From<ThemeStyle> for HighlightStyle {
     }
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct SyntaxColors {
     pub attribute: Option<ThemeStyle>,
     pub boolean: Option<ThemeStyle>,
@@ -332,7 +332,7 @@ impl SyntaxColors {
     }
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct StatusColors {
     // Minimal stub
 }
@@ -399,7 +399,7 @@ impl StatusColors {
     }
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct HighlightThemeStyle {
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub editor_background: Option<gpui::Hsla>,
@@ -422,7 +422,7 @@ pub struct HighlightThemeStyle {
     pub syntax: SyntaxColors,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct HighlightTheme {
     pub name: String,
     #[serde(default)]

@@ -7,7 +7,7 @@ use gpui::{
 };
 
 /// The variant of the Tag.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum TagVariant {
     Primary,
     #[default]

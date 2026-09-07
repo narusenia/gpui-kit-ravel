@@ -107,7 +107,7 @@ impl LanguageConfig {
 /// Theme for Tree-sitter Highlight
 ///
 /// https://docs.rs/tree-sitter-highlight/0.26.8/tree_sitter_highlight/
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct SyntaxColors {
     pub attribute: Option<ThemeStyle>,
     pub boolean: Option<ThemeStyle>,
@@ -217,7 +217,7 @@ impl From<FontWeightContent> for FontWeight {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct ThemeStyle {
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     color: Option<Hsla>,
@@ -310,7 +310,7 @@ impl SyntaxColors {
     }
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct StatusColors {
     #[serde(rename = "error")]
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
@@ -446,7 +446,7 @@ impl StatusColors {
     }
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct HighlightThemeStyle {
     #[serde(rename = "editor.background")]
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
@@ -482,7 +482,7 @@ pub struct HighlightThemeStyle {
 /// This json is compatible with the Zed theme format.
 ///
 /// https://zed.dev/docs/extensions/languages#syntax-highlighting
-#[derive(Debug, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct HighlightTheme {
     pub name: String,
     #[serde(default)]
