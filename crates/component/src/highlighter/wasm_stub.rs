@@ -130,6 +130,7 @@ pub enum FontWeightContent {
 #[derive(Debug, Clone, Copy, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct ThemeStyle {
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
+    #[serde(default, with = "crate::theme::color::hex_option")]
     pub color: Option<gpui::Hsla>,
     pub font_style: Option<FontStyle>,
     pub font_weight: Option<FontWeightContent>,
@@ -402,19 +403,26 @@ impl StatusColors {
 #[derive(Debug, Default, Clone, PartialEq, JsonSchema, Serialize, Deserialize)]
 pub struct HighlightThemeStyle {
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
+    #[serde(default, with = "crate::theme::color::hex_option")]
     pub editor_background: Option<gpui::Hsla>,
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
+    #[serde(default, with = "crate::theme::color::hex_option")]
     pub editor_foreground: Option<gpui::Hsla>,
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
+    #[serde(default, with = "crate::theme::color::hex_option")]
     pub editor_active_line: Option<gpui::Hsla>,
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
+    #[serde(default, with = "crate::theme::color::hex_option")]
     pub editor_line_number: Option<gpui::Hsla>,
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
+    #[serde(default, with = "crate::theme::color::hex_option")]
     pub editor_active_line_number: Option<gpui::Hsla>,
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
+    #[serde(default, with = "crate::theme::color::hex_option")]
     pub editor_invisible: Option<gpui::Hsla>,
     #[serde(rename = "editor.gutter.background")]
     #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
+    #[serde(default, with = "crate::theme::color::hex_option")]
     pub editor_gutter_background: Option<gpui::Hsla>,
     #[serde(flatten)]
     pub status: StatusColors,

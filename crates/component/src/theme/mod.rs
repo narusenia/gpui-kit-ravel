@@ -16,7 +16,7 @@ use std::{
     time::Duration,
 };
 
-mod color;
+pub(crate) mod color;
 mod motion;
 mod registry;
 mod schema;

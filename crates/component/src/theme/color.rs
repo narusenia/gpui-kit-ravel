@@ -342,6 +342,36 @@ impl Colorize for Hsla {
     }
 }
 
+/// Serde for an `Option<Hsla>` written as a CSS-style hex string.
+///
+/// `palette::Hsla` derives serde, so on its own it reads and writes the four
+/// HSL components as a struct. The theme files this crate ships spell colors
+/// as `#rrggbb`, which is what gpui's `Hsla` accepted before it became a
+/// palette alias, so the conversion lives here instead — the fields keep their
+/// `Hsla` type.
+pub(crate) mod hex_option {
+    use super::Colorize as _;
+    use gpui::Hsla;
+    use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error as _};
+
+    pub(crate) fn serialize<S>(color: &Option<Hsla>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        color.map(|color| color.to_hex()).serialize(serializer)
+    }
+
+    pub(crate) fn deserialize<'de, D>(deserializer: D) -> Result<Option<Hsla>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let Some(hex) = Option::<String>::deserialize(deserializer)? else {
+            return Ok(None);
+        };
+        Hsla::parse_hex(&hex).map(Some).map_err(D::Error::custom)
+    }
+}
+
 pub(crate) static DEFAULT_COLORS: once_cell::sync::Lazy<ShadcnColors> =
     once_cell::sync::Lazy::new(|| {
         serde_json::from_str(include_str!("./default-colors.json"))
