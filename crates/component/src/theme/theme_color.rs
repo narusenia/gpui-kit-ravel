@@ -2,7 +2,7 @@ use std::{ops::Deref, sync::Arc};
 
 use crate::{ThemeMode, theme::DEFAULT_THEME_COLORS};
 
-use gpui::{Background, Fill, Hsla};
+use gpui::{Background, Hsla};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -46,12 +46,6 @@ impl From<ThemeToken> for Hsla {
 impl From<ThemeToken> for Background {
     fn from(token: ThemeToken) -> Self {
         token.background
-    }
-}
-
-impl From<ThemeToken> for Fill {
-    fn from(token: ThemeToken) -> Self {
-        Fill::Color(token.background)
     }
 }
 
