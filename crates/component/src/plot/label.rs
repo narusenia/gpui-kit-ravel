@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use gpui::{
     App, Bounds, FontWeight, Hsla, Pixels, Point, ShapedLine, SharedString, TextAlign, TextRun,
-    Window, point, px,
+    Window, hsla, point, px,
 };
 
 use super::origin_point;
@@ -17,13 +17,15 @@ fn shape_label(
     color: Hsla,
     window: &mut Window,
 ) -> ShapedLine {
+    let text_style = window.text_style();
     let text_run = TextRun {
         len: text.len(),
-        font: window.text_style().font(),
+        font: text_style.font(),
         color,
         background_color: None,
         underline: None,
         strikethrough: None,
+        letter_spacing: text_style.letter_spacing,
     };
     window
         .text_system()
@@ -37,19 +39,9 @@ pub fn measure_text_width(text: &SharedString, font_size: Pixels, window: &mut W
     if text.is_empty() {
         return 0.;
     }
-    shape_label(
-        text,
-        font_size,
-        Hsla {
-            h: 0.,
-            s: 0.,
-            l: 0.,
-            a: 1.,
-        },
-        window,
-    )
-    .width()
-    .as_f32()
+    shape_label(text, font_size, hsla(0., 0., 0., 1.), window)
+        .width()
+        .as_f32()
 }
 
 /// Truncate `text` with a trailing ellipsis so it fits within `max_width` at

@@ -2,7 +2,7 @@ use std::{hash::Hash, ops::RangeInclusive, rc::Rc};
 
 use gpui::{
     AnyElement, App, Background, Bounds, Corners, ElementId, Hsla, IntoElement, LinearColorStop,
-    Pixels, Point, SharedString, Size, TextAlign, Window, linear_gradient, point, px,
+    Pixels, Point, SharedString, Size, TextAlign, Window, hsla, linear_gradient, point, px,
 };
 use gpui_component_macros::IntoPlot;
 use num_traits::{Num, ToPrimitive};
@@ -722,18 +722,25 @@ fn clip_stops_to_bar(stops: [LinearColorStop; 2]) -> [LinearColorStop; 2] {
     let [a, b] = stops;
     let p0 = a.percentage;
     let p1 = b.percentage;
+    // A stop's color is a `SceneHsla`, whose components are private; the
+    // interpolation runs on the `Hsla` it converts to. `hsla()` takes the hue
+    // as a 0..1 fraction of the circle, which is what `SceneHsla` stored, so
+    // that is the value being interpolated.
+    let from: Hsla = a.color.into();
+    let to: Hsla = b.color.into();
+    let turns = |color: &Hsla| color.hue.into_positive_degrees() / 360.;
     let lerp = |t: f32| -> Hsla {
-        Hsla {
-            h: a.color.h + (b.color.h - a.color.h) * t,
-            s: a.color.s + (b.color.s - a.color.s) * t,
-            l: a.color.l + (b.color.l - a.color.l) * t,
-            a: a.color.a + (b.color.a - a.color.a) * t,
-        }
+        hsla(
+            turns(&from) + (turns(&to) - turns(&from)) * t,
+            from.saturation + (to.saturation - from.saturation) * t,
+            from.lightness + (to.lightness - from.lightness) * t,
+            from.alpha + (to.alpha - from.alpha) * t,
+        )
     };
     let span = p1 - p0;
     let sample = |target: f32| -> Hsla {
         if span.abs() < f32::EPSILON {
-            a.color
+            from
         } else {
             lerp((target - p0) / span)
         }
@@ -742,7 +749,7 @@ fn clip_stops_to_bar(stops: [LinearColorStop; 2]) -> [LinearColorStop; 2] {
         a
     } else {
         LinearColorStop {
-            color: sample(p0.clamp(0., 1.)),
+            color: sample(p0.clamp(0., 1.)).into(),
             percentage: p0.clamp(0., 1.),
         }
     };
@@ -750,7 +757,7 @@ fn clip_stops_to_bar(stops: [LinearColorStop; 2]) -> [LinearColorStop; 2] {
         b
     } else {
         LinearColorStop {
-            color: sample(p1.clamp(0., 1.)),
+            color: sample(p1.clamp(0., 1.)).into(),
             percentage: p1.clamp(0., 1.),
         }
     };

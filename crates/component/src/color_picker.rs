@@ -244,6 +244,9 @@ impl ColorPicker {
     }
 
     fn render_slider_tab_panel(&self, slider_color: Hsla, cx: &mut App) -> impl IntoElement {
+        // `Hsla` stores the hue in degrees, while both the track colors and the
+        // readout below work in the 0..1 fraction `hsla()` takes.
+        let hue = slider_color.hue.into_positive_degrees() / 360.;
         let sliders = self.state.read(cx).sliders().clone();
         let steps = 96usize;
         let hue_colors = (0..steps)
@@ -252,16 +255,16 @@ impl ColorPicker {
                 hsla(h, 1.0, 0.5, 1.0)
             })
             .collect::<Vec<_>>();
-        let saturation_start = hsla(slider_color.h, 0.0, slider_color.l, 1.0);
-        let saturation_end = hsla(slider_color.h, 1.0, slider_color.l, 1.0);
+        let saturation_start = hsla(hue, 0.0, slider_color.lightness, 1.0);
+        let saturation_end = hsla(hue, 1.0, slider_color.lightness, 1.0);
         let lightness_colors = (0..steps)
             .map(|ix| {
                 let l = ix as f32 / (steps.saturating_sub(1)) as f32;
-                hsla(slider_color.h, 1.0, l, 1.0)
+                hsla(hue, 1.0, l, 1.0)
             })
             .collect::<Vec<_>>();
-        let alpha_start = hsla(slider_color.h, slider_color.s, slider_color.l, 0.0);
-        let alpha_end = hsla(slider_color.h, slider_color.s, slider_color.l, 1.0);
+        let alpha_start = hsla(hue, slider_color.saturation, slider_color.lightness, 0.0);
+        let alpha_end = hsla(hue, slider_color.saturation, slider_color.lightness, 1.0);
 
         let label_color = cx.theme().foreground.opacity(0.7);
 
@@ -298,7 +301,7 @@ impl ColorPicker {
                             .text_xs()
                             .text_color(label_color)
                             .text_align(TextAlign::Right)
-                            .child(format!("{:.0}", slider_color.h * 360.)),
+                            .child(format!("{:.0}", hue * 360.)),
                     ),
             )
             .child(
@@ -336,7 +339,7 @@ impl ColorPicker {
                             .text_xs()
                             .text_color(label_color)
                             .text_align(TextAlign::Right)
-                            .child(format!("{:.0}", slider_color.s * 100.)),
+                            .child(format!("{:.0}", slider_color.saturation * 100.)),
                     ),
             )
             .child(
@@ -370,7 +373,7 @@ impl ColorPicker {
                             .text_xs()
                             .text_color(label_color)
                             .text_align(TextAlign::Right)
-                            .child(format!("{:.0}", slider_color.l * 100.)),
+                            .child(format!("{:.0}", slider_color.lightness * 100.)),
                     ),
             )
             .child(
@@ -404,7 +407,7 @@ impl ColorPicker {
                             .text_xs()
                             .text_color(label_color)
                             .text_align(TextAlign::Right)
-                            .child(format!("{:.0}", slider_color.a * 100.)),
+                            .child(format!("{:.0}", slider_color.alpha * 100.)),
                     ),
             )
     }

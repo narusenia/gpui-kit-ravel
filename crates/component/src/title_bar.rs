@@ -7,8 +7,8 @@ use gpui::{
     AnyElement, App, Background, ClickEvent, Context, Decorations, Hsla, InteractiveElement,
     IntoElement, MouseButton, ParentElement, Pixels, Render, RenderOnce, Rgba,
     StatefulInteractiveElement as _, StyleRefinement, Styled, TitlebarOptions, Window,
-    WindowControlArea, WindowOptions, div, linear_color_stop, linear_gradient,
-    prelude::FluentBuilder as _, px,
+    WindowControlArea, WindowOptions, div, hsla_to_rgba, linear_color_stop, linear_gradient,
+    prelude::FluentBuilder as _, px, rgb_to_hsla,
 };
 use smallvec::SmallVec;
 
@@ -19,14 +19,14 @@ const TITLE_BAR_LEFT_PADDING: Pixels = px(80.);
 const TITLE_BAR_LEFT_PADDING: Pixels = px(12.);
 
 fn default_title_bar_background(title_bar: Hsla, background: Hsla) -> Background {
-    let title_bar_rgb = title_bar.to_rgb();
-    let background_rgb = background.to_rgb();
-    let mixed = Hsla::from(Rgba {
-        r: title_bar_rgb.r * 0.55 + background_rgb.r * 0.45,
-        g: title_bar_rgb.g * 0.55 + background_rgb.g * 0.45,
-        b: title_bar_rgb.b * 0.55 + background_rgb.b * 0.45,
-        a: title_bar_rgb.a * 0.55 + background_rgb.a * 0.45,
-    });
+    let title_bar_rgb = hsla_to_rgba(title_bar);
+    let background_rgb = hsla_to_rgba(background);
+    let mixed = rgb_to_hsla(Rgba::new(
+        title_bar_rgb.red * 0.55 + background_rgb.red * 0.45,
+        title_bar_rgb.green * 0.55 + background_rgb.green * 0.45,
+        title_bar_rgb.blue * 0.55 + background_rgb.blue * 0.45,
+        title_bar_rgb.alpha * 0.55 + background_rgb.alpha * 0.45,
+    ));
 
     linear_gradient(
         180.,
