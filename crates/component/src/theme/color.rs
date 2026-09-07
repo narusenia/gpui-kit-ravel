@@ -267,23 +267,29 @@ impl Colorize for Hsla {
     }
 
     fn to_hex(&self) -> String {
+        // Round rather than truncate. A colour that arrived as 8-bit text
+        // comes back from `Rgba -> Hsla -> Rgba` a hair below where it went
+        // in (19/255 returns as 18.99999), and `as u32` then biases every
+        // channel down by a whole step: green-500 is `#22c55e` in
+        // `default-colors.json` and truncation printed it as `#21C55E`.
+        // Rounding is what makes `parse_hex` and `to_hex` inverses.
         let rgb = hsla_to_rgba(*self);
 
         if rgb.alpha < 1. {
             return format!(
                 "#{:02X}{:02X}{:02X}{:02X}",
-                ((rgb.red * 255.) as u32),
-                ((rgb.green * 255.) as u32),
-                ((rgb.blue * 255.) as u32),
-                ((self.alpha * 255.) as u32)
+                ((rgb.red * 255.).round() as u32),
+                ((rgb.green * 255.).round() as u32),
+                ((rgb.blue * 255.).round() as u32),
+                ((self.alpha * 255.).round() as u32)
             );
         }
 
         format!(
             "#{:02X}{:02X}{:02X}",
-            ((rgb.red * 255.) as u32),
-            ((rgb.green * 255.) as u32),
-            ((rgb.blue * 255.) as u32)
+            ((rgb.red * 255.).round() as u32),
+            ((rgb.green * 255.).round() as u32),
+            ((rgb.blue * 255.).round() as u32)
         )
     }
 
@@ -1060,7 +1066,7 @@ mod tests {
 
         assert_eq!(red.mix(blue, 0.5).to_hex(), "#FF00FF");
         assert_eq!(green.mix(red, 0.5).to_hex(), "#FFFF00");
-        assert_eq!(blue.mix(yellow, 0.2).to_hex(), "#0098FF");
+        assert_eq!(blue.mix(yellow, 0.2).to_hex(), "#0099FF");
     }
 
     #[test]
@@ -1116,8 +1122,10 @@ mod tests {
         assert_eq!(format!("{:?}", ColorName::Yellow), "Yellow");
 
         let color = ColorName::Green;
-        assert_eq!(color.scale(500).to_hex(), "#21C55E");
-        assert_eq!(color.scale(1500).to_hex(), "#21C55E");
+        // `default-colors.json` holds green-500 as `#22c55e`; the old
+        // `#21C55E` was the truncating `to_hex` losing a step.
+        assert_eq!(color.scale(500).to_hex(), "#22C55E");
+        assert_eq!(color.scale(1500).to_hex(), "#22C55E");
 
         for name in ColorName::all().iter() {
             let name1: ColorName = name.to_string().as_str().try_into().unwrap();
