@@ -745,32 +745,32 @@ impl ThemeColor {
         apply_color!(red);
         apply_color!(
             red_light,
-            fallback = self.background.blend(self.red.opacity(0.8))
+            fallback = gpui::ColorExt::blend(&self.background, &self.red.opacity(0.8))
         );
         apply_color!(green);
         apply_color!(
             green_light,
-            fallback = self.background.blend(self.green.opacity(0.8))
+            fallback = gpui::ColorExt::blend(&self.background, &self.green.opacity(0.8))
         );
         apply_color!(blue);
         apply_color!(
             blue_light,
-            fallback = self.background.blend(self.blue.opacity(0.8))
+            fallback = gpui::ColorExt::blend(&self.background, &self.blue.opacity(0.8))
         );
         apply_color!(magenta);
         apply_color!(
             magenta_light,
-            fallback = self.background.blend(self.magenta.opacity(0.8))
+            fallback = gpui::ColorExt::blend(&self.background, &self.magenta.opacity(0.8))
         );
         apply_color!(yellow);
         apply_color!(
             yellow_light,
-            fallback = self.background.blend(self.yellow.opacity(0.8))
+            fallback = gpui::ColorExt::blend(&self.background, &self.yellow.opacity(0.8))
         );
         apply_color!(cyan);
         apply_color!(
             cyan_light,
-            fallback = self.background.blend(self.cyan.opacity(0.8))
+            fallback = gpui::ColorExt::blend(&self.background, &self.cyan.opacity(0.8))
         );
 
         apply_color!(border);
@@ -779,7 +779,7 @@ impl ThemeColor {
         apply_background_color!(muted);
         apply_color!(
             muted_foreground,
-            fallback = self.muted.blend(self.foreground.opacity(0.7))
+            fallback = gpui::ColorExt::blend(&self.muted, &self.foreground.opacity(0.7))
         );
 
         // Button colors
@@ -805,7 +805,8 @@ impl ThemeColor {
         apply_color!(primary_foreground, fallback = self.foreground);
         apply_background_color!(
             primary_hover,
-            fallback = self.background.blend(self.primary.opacity(hover_opacity))
+            fallback =
+                gpui::ColorExt::blend(&self.background, &self.primary.opacity(hover_opacity))
         );
         apply_background_color!(
             primary_active,
@@ -822,7 +823,8 @@ impl ThemeColor {
         apply_color!(secondary_foreground, fallback = self.foreground);
         apply_background_color!(
             secondary_hover,
-            fallback = self.background.blend(self.secondary.opacity(hover_opacity))
+            fallback =
+                gpui::ColorExt::blend(&self.background, &self.secondary.opacity(hover_opacity))
         );
         apply_background_color!(
             secondary_active,
@@ -839,7 +841,8 @@ impl ThemeColor {
         apply_color!(success_foreground, fallback = self.primary_foreground);
         apply_background_color!(
             success_hover,
-            fallback = self.background.blend(self.success.opacity(hover_opacity))
+            fallback =
+                gpui::ColorExt::blend(&self.background, &self.success.opacity(hover_opacity))
         );
         apply_background_color!(
             success_active,
@@ -862,7 +865,7 @@ impl ThemeColor {
         apply_color!(info_foreground, fallback = self.primary_foreground);
         apply_background_color!(
             info_hover,
-            fallback = self.background.blend(self.info.opacity(hover_opacity))
+            fallback = gpui::ColorExt::blend(&self.background, &self.info.opacity(hover_opacity))
         );
         apply_background_color!(info_active, fallback = self.info.darken(active_darken));
         apply_background_color!(
@@ -882,11 +885,11 @@ impl ThemeColor {
         apply_color!(warning_foreground, fallback = self.primary_foreground);
         apply_background_color!(
             warning_hover,
-            fallback = self.background.blend(self.warning.opacity(0.9))
+            fallback = gpui::ColorExt::blend(&self.background, &self.warning.opacity(0.9))
         );
         apply_background_color!(
             warning_active,
-            fallback = self.background.blend(self.warning.darken(active_darken))
+            fallback = gpui::ColorExt::blend(&self.background, &self.warning.darken(active_darken))
         );
         apply_background_color!(
             button_warning,
@@ -908,12 +911,12 @@ impl ThemeColor {
         apply_background_color!(accordion, fallback = tokens.background);
         apply_background_color!(
             group_box,
-            fallback = self
-                .background
-                .blend(
-                    self.secondary
-                        .opacity(if config.mode.is_dark() { 0.3 } else { 0.4 })
-                )
+            fallback = gpui::ColorExt::blend(
+                &self.background,
+                &self
+                    .secondary
+                    .opacity(if config.mode.is_dark() { 0.3 } else { 0.4 })
+            )
         );
         apply_color!(group_box_foreground, fallback = self.foreground);
         apply_color!(caret, fallback = self.primary);
@@ -929,7 +932,7 @@ impl ThemeColor {
         apply_color!(danger_foreground, fallback = self.primary_foreground);
         apply_background_color!(
             danger_hover,
-            fallback = self.background.blend(self.danger.opacity(0.9))
+            fallback = gpui::ColorExt::blend(&self.background, &self.danger.opacity(0.9))
         );
         apply_background_color!(
             button_danger,
@@ -946,7 +949,7 @@ impl ThemeColor {
         );
         apply_background_color!(
             description_list_label,
-            fallback = self.background.blend(self.border.opacity(0.2))
+            fallback = gpui::ColorExt::blend(&self.background, &self.border.opacity(0.2))
         );
         apply_color!(
             description_list_label_foreground,
@@ -960,11 +963,11 @@ impl ThemeColor {
         apply_background_color!(list, fallback = tokens.background);
         apply_background_color!(
             list_active,
-            fallback = self.background.blend(self.primary.opacity(0.1))
+            fallback = gpui::ColorExt::blend(&self.background, &self.primary.opacity(0.1))
         );
         apply_color!(
             list_active_border,
-            fallback = self.background.blend(self.primary.opacity(0.6))
+            fallback = gpui::ColorExt::blend(&self.background, &self.primary.opacity(0.6))
         );
         apply_background_color!(list_even, fallback = tokens.list);
         apply_background_color!(list_head, fallback = tokens.list);
@@ -979,7 +982,7 @@ impl ThemeColor {
         apply_background_color!(selection, fallback = tokens.primary);
         apply_background_color!(
             sidebar,
-            fallback = self.background.blend(self.border.opacity(0.15))
+            fallback = gpui::ColorExt::blend(&self.background, &self.border.opacity(0.15))
         );
         apply_background_color!(sidebar_accent, fallback = tokens.accent);
         apply_color!(sidebar_accent_foreground, fallback = self.accent_foreground);
@@ -1023,9 +1026,12 @@ impl ThemeColor {
 
         // Ensure opacity for list_active, table_active, selection.
         let clamp_alpha = |raw: Option<&str>, color: Hsla, background: Background, max: f32| {
-            let base = color.a;
+            let base = color.alpha;
             let target = base.min(max);
-            let color = color.alpha(target);
+            let color = Hsla {
+                alpha: target,
+                ..color
+            };
             let background = raw
                 .and_then(|value| try_parse_background_clamped(value, max).ok())
                 .unwrap_or_else(|| {

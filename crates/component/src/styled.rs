@@ -32,7 +32,10 @@ const POPOVER_RING_INK: f32 = 0.1;
 /// token: a fixed black ring would all but vanish on a dark surface.
 ///
 pub(crate) fn popover_ring(cx: &App) -> Hsla {
-    cx.theme().foreground.alpha(POPOVER_RING_INK)
+    Hsla {
+        alpha: POPOVER_RING_INK,
+        ..cx.theme().foreground
+    }
 }
 
 /// shadcn/ui's popup surface shadow — a hairline `ring` plus `shadow-md` — at
@@ -60,9 +63,16 @@ pub(crate) fn popover_shadow(ring: Hsla, strength: f32) -> Vec<BoxShadow> {
     vec![
         // The ring, sitting in the 1px band outside the surface. No blur, so it
         // takes the shader's crisp path rather than the gaussian one.
-        BoxShadow::new(px(0.), px(0.), ring.alpha(ring.a * strength))
-            .blur_radius(px(0.))
-            .spread_radius(px(1.)),
+        BoxShadow::new(
+            px(0.),
+            px(0.),
+            Hsla {
+                alpha: ring.alpha * strength,
+                ..ring
+            },
+        )
+        .blur_radius(px(0.))
+        .spread_radius(px(1.)),
         BoxShadow::new(px(0.), px(4.), ink)
             .blur_radius(px(3.))
             .spread_radius(px(-1.)),
@@ -246,7 +256,10 @@ impl<T: Styled + Sized> ThemeStyled for T {
                 .right(-(inset + border_widths.right))
                 .bottom(-(inset + border_widths.bottom))
                 .border(FOCUS_RING_WIDTH)
-                .border_color(cx.theme().ring.alpha(FOCUS_RING_OPACITY))
+                .border_color(Hsla {
+                    alpha: FOCUS_RING_OPACITY,
+                    ..cx.theme().ring
+                })
                 .refine_style(&ring_style),
         )
     }

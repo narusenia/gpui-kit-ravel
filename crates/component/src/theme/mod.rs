@@ -449,7 +449,10 @@ impl Theme {
 
     pub fn shadow_tokens(&self) -> ShadowTokens {
         if self.shadow {
-            ShadowTokens::elevations(self.transparent.alpha(0.18))
+            ShadowTokens::elevations(Hsla {
+                alpha: 0.18,
+                ..self.transparent
+            })
         } else {
             ShadowTokens::default()
         }
@@ -615,7 +618,7 @@ impl From<&ThemeColor> for Theme {
     fn from(colors: &ThemeColor) -> Self {
         Theme {
             mode: ThemeMode::default(),
-            transparent: Hsla::transparent_black(),
+            transparent: gpui::transparent_black(),
             font_family: ".SystemUIFont".into(),
             font_size: px(16.),
             mono_font_family: if cfg!(target_os = "macos") {
