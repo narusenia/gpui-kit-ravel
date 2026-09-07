@@ -978,7 +978,11 @@ impl Scrollbar {
     /// explicit `ScrollbarStyles` still wins: this is the bottom of the
     /// cascade, not a new top of it.
     fn thumb_default_background(cx: &App, alpha: f32) -> Background {
-        cx.theme().tokens.colors.foreground.alpha(alpha).into()
+        Hsla {
+            alpha,
+            ..cx.theme().tokens.colors.foreground
+        }
+        .into()
     }
 
     fn thumb_defaults(

@@ -153,11 +153,13 @@ impl HslaSliders {
     }
 
     fn write(&self, color: Hsla, window: &mut Window, cx: &mut App) {
+        // The sliders run 0..1, so the hue goes back to a fraction of the
+        // circle rather than the degrees `Hsla` stores.
         let components = [
-            (&self.hue, color.h),
-            (&self.saturation, color.s),
-            (&self.lightness, color.l),
-            (&self.alpha, color.a),
+            (&self.hue, color.hue.into_positive_degrees() / 360.),
+            (&self.saturation, color.saturation),
+            (&self.lightness, color.lightness),
+            (&self.alpha, color.alpha),
         ];
         for (slider, value) in components {
             slider.update(cx, |slider, cx| slider.set_value(value, window, cx));
