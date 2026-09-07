@@ -240,7 +240,7 @@ impl HighlightStyleResolver for ShowcaseHighlightStyles {
             _ => return None,
         };
         Some(HighlightStyle {
-            color: Some(super::example_rgb(color).into()),
+            color: Some(gpui::rgb_to_hsla(super::example_rgb(color))),
             ..Default::default()
         })
     }
