@@ -672,13 +672,12 @@ impl StatefulInteractiveElement for SliderIndicator {}
 
 impl RenderOnce for SliderIndicator {
     fn render(self, _: &mut Window, _: &mut App) -> impl IntoElement {
-        self.base
-            .id("slider-bar")
-            .children(self.children)
-            .on_prepaint({
-                let state = self.state;
-                move |bounds, _, cx| state.update(cx, |state, _| state.set_bounds(bounds))
-            })
+        // `Stateful` now carries gpui's own `on_prepaint`, so name the one this
+        // crate means.
+        ElementExt::on_prepaint(self.base.id("slider-bar").children(self.children), {
+            let state = self.state;
+            move |bounds, _, cx| state.update(cx, |state, _| state.set_bounds(bounds))
+        })
     }
 }
 

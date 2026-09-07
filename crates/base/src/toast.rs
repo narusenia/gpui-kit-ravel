@@ -12,7 +12,7 @@ use gpui::{
 };
 
 use crate::{
-    ElementExt as _, StyledExt as _,
+    ElementExt, StyledExt as _,
     motion::{Spring, spring},
 };
 
@@ -516,7 +516,7 @@ impl RenderOnce for ToastStack {
                     window,
                     cx,
                 );
-                div()
+                let card = div()
                     .id(item_id.clone())
                     .absolute()
                     .top_0()
@@ -528,15 +528,17 @@ impl RenderOnce for ToastStack {
                     .opacity(opacity)
                     .when(!expanded && rank >= collapsed_visible, |this| {
                         this.invisible()
-                    })
-                    .on_prepaint(move |bounds, _, cx| {
-                        let mut heights = measured.borrow_mut();
-                        if heights.get(&measured_id).copied() != Some(bounds.size.height) {
-                            heights.insert(measured_id.clone(), bounds.size.height);
-                            cx.refresh_windows();
-                        }
-                    })
-                    .child(child)
+                    });
+                // `Stateful` now carries gpui's own `on_prepaint`, so name the
+                // one this crate means.
+                ElementExt::on_prepaint(card, move |bounds, _, cx| {
+                    let mut heights = measured.borrow_mut();
+                    if heights.get(&measured_id).copied() != Some(bounds.size.height) {
+                        heights.insert(measured_id.clone(), bounds.size.height);
+                        cx.refresh_windows();
+                    }
+                })
+                .child(child)
             });
 
         let hovered_state = self.state.hovered.clone();
