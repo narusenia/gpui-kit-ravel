@@ -1010,6 +1010,28 @@ mod tests {
     }
 
     #[test]
+    fn hue_setters_and_inversion_stay_in_the_degree_domain() {
+        // `Hsla` stores the hue in degrees while `Colorize` takes and reports a
+        // 0..1 fraction of the circle, so every conversion has to scale by 360.
+        let degrees = |color: Hsla| color.hue.into_positive_degrees();
+
+        assert_eq!(degrees(hsl(210., 40., 98.)), 210.);
+        assert_eq!(degrees(hsl(210., 40., 98.).hue(0.5)), 180.);
+        assert_eq!(degrees(hsl(0., 40., 98.).hue(1.)), 0.);
+
+        let inverted = hsl(90., 25., 40.).invert();
+        assert_eq!(degrees(inverted), 270.);
+        assert_eq!(inverted.saturation, 0.75);
+        assert!((inverted.lightness - 0.6).abs() < 1e-6);
+
+        // A midpoint mix takes the short way round the circle, in degrees.
+        assert_eq!(
+            degrees(hsl(350., 50., 50.).mix(hsl(10., 50., 50.), 0.5)),
+            0.
+        );
+    }
+
+    #[test]
     fn test_lighten() {
         let color = super::hsl(240.0, 5.0, 30.0);
         let color = color.lighten(0.5);
