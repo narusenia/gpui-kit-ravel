@@ -6,9 +6,9 @@ use gpui::{
     GlobalElementId,
 };
 use gpui::{
-    HighlightStyle, Hitbox, HitboxBehavior, Hsla, InteractiveElement, IntoElement, LayoutId,
-    MouseButton, MouseMoveEvent, MouseUpEvent, ParentElement as _, Path, Pixels, Point, Position,
-    ShapedLine, SharedString, Size, Style, Styled as _, TextAlign, TextRun, TextStyle,
+    ColorExt as _, HighlightStyle, Hitbox, HitboxBehavior, Hsla, InteractiveElement, IntoElement,
+    LayoutId, MouseButton, MouseMoveEvent, MouseUpEvent, ParentElement as _, Path, Pixels, Point,
+    Position, ShapedLine, SharedString, Size, Style, Styled as _, TextAlign, TextRun, TextStyle,
     UnderlineStyle, Window, fill, point, px, relative, size,
 };
 use ropey::Rope;
