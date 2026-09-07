@@ -213,7 +213,7 @@ impl RenderOnce for Toggle {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ElementExt as _;
+    use crate::ElementExt;
     use std::{
         cell::{Cell, RefCell},
         rc::Rc,
@@ -326,7 +326,7 @@ mod tests {
             fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
                 let root_capture = self.0.clone();
                 let child_capture = self.0.clone();
-                Toggle::new("alignment-toggle")
+                let root = Toggle::new("alignment-toggle")
                     .w(px(120.))
                     .h(px(40.))
                     .child(
@@ -336,10 +336,10 @@ mod tests {
                             .on_prepaint(move |bounds, _, _| {
                                 child_capture.lock().unwrap().1 = Some(bounds);
                             }),
-                    )
-                    .on_prepaint(move |bounds, _, _| {
-                        root_capture.lock().unwrap().0 = Some(bounds);
-                    })
+                    );
+                ElementExt::on_prepaint(root, move |bounds, _, _| {
+                    root_capture.lock().unwrap().0 = Some(bounds);
+                })
             }
         }
 

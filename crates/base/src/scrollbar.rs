@@ -2203,8 +2203,20 @@ mod tests {
             crate::Theme::global_mut(cx).tokens.colors.foreground = dark;
             let (on_dark, ..) = scrollbar.style_for_normal(cx);
 
-            assert_eq!(on_light, Background::from(light.alpha(0.35)));
-            assert_eq!(on_dark, Background::from(dark.alpha(0.35)));
+            assert_eq!(
+                on_light,
+                Background::from(Hsla {
+                    alpha: 0.35,
+                    ..light
+                })
+            );
+            assert_eq!(
+                on_dark,
+                Background::from(Hsla {
+                    alpha: 0.35,
+                    ..dark
+                })
+            );
             // The point of the change: a thumb that never moved with the
             // palette was invisible on one of the two surfaces.
             assert_ne!(on_light, on_dark);

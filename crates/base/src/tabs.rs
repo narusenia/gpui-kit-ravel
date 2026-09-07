@@ -235,7 +235,7 @@ impl RenderOnce for Tabs {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ElementExt as _;
+    use crate::ElementExt;
     use std::{
         cell::Cell,
         rc::Rc,
@@ -301,20 +301,17 @@ mod tests {
             fn render(&mut self, _: &mut Window, _: &mut Context<Self>) -> impl IntoElement {
                 let root_capture = self.0.clone();
                 let child_capture = self.0.clone();
-                Tab::new("alignment-tab")
-                    .w(px(120.))
-                    .h(px(40.))
-                    .child(
-                        div()
-                            .w(px(48.))
-                            .h(px(12.))
-                            .on_prepaint(move |bounds, _, _| {
-                                child_capture.lock().unwrap().1 = Some(bounds);
-                            }),
-                    )
-                    .on_prepaint(move |bounds, _, _| {
-                        root_capture.lock().unwrap().0 = Some(bounds);
-                    })
+                let root = Tab::new("alignment-tab").w(px(120.)).h(px(40.)).child(
+                    div()
+                        .w(px(48.))
+                        .h(px(12.))
+                        .on_prepaint(move |bounds, _, _| {
+                            child_capture.lock().unwrap().1 = Some(bounds);
+                        }),
+                );
+                ElementExt::on_prepaint(root, move |bounds, _, _| {
+                    root_capture.lock().unwrap().0 = Some(bounds);
+                })
             }
         }
 
