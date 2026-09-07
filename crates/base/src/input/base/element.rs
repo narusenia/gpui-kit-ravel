@@ -957,6 +957,7 @@ impl<M: InputModeKind> TextElement<M> {
                     background_color: None,
                     underline: None,
                     strikethrough: None,
+                    letter_spacing: style.letter_spacing,
                 }],
                 None,
             );
@@ -1009,6 +1010,7 @@ impl<M: InputModeKind> TextElement<M> {
                 background_color: None,
                 underline: None,
                 strikethrough: None,
+                letter_spacing: style.letter_spacing,
             }],
             None,
         );
@@ -1024,6 +1026,7 @@ impl<M: InputModeKind> TextElement<M> {
                 background_color: None,
                 underline: None,
                 strikethrough: None,
+                letter_spacing: style.letter_spacing,
             }],
             None,
         );
@@ -1081,6 +1084,7 @@ impl<M: InputModeKind> TextElement<M> {
                 background_color: None,
                 underline: None,
                 strikethrough: None,
+                letter_spacing: text_style.letter_spacing,
             };
             Some(
                 window
@@ -1104,6 +1108,7 @@ impl<M: InputModeKind> TextElement<M> {
                     background_color: None,
                     underline: None,
                     strikethrough: None,
+                    letter_spacing: text_style.letter_spacing,
                 };
                 // Use space for empty lines so they take up height
                 let shaped_text = if text.is_empty() { " ".into() } else { text };
@@ -1821,6 +1826,7 @@ impl<M: InputModeKind> Element for TextElement<M> {
             background_color: None,
             underline: None,
             strikethrough: None,
+            letter_spacing: style.letter_spacing,
         };
         let marked_run = TextRun {
             len: 0,
@@ -1833,6 +1839,7 @@ impl<M: InputModeKind> Element for TextElement<M> {
                 wavy: false,
             }),
             strikethrough: None,
+            letter_spacing: style.letter_spacing,
         };
 
         let ime_marked_range = ime_marked_display_range(
@@ -1905,6 +1912,7 @@ impl<M: InputModeKind> Element for TextElement<M> {
                         background_color: None,
                         underline: None,
                         strikethrough: None,
+                        letter_spacing: style.letter_spacing,
                     }],
                     wrap_width,
                 )
@@ -2007,6 +2015,7 @@ impl<M: InputModeKind> Element for TextElement<M> {
                 background_color: None,
                 underline: None,
                 strikethrough: None,
+                letter_spacing: style.letter_spacing,
             }];
             let current_line_runs = vec![TextRun {
                 len: line_number_len,
@@ -2015,6 +2024,7 @@ impl<M: InputModeKind> Element for TextElement<M> {
                 background_color: None,
                 underline: None,
                 strikethrough: None,
+                letter_spacing: style.letter_spacing,
             }];
 
             // build line numbers
@@ -2800,6 +2810,7 @@ mod tests {
             background_color: None,
             underline: None,
             strikethrough: None,
+            letter_spacing: None,
         };
 
         // use hello this-is-test
@@ -2949,6 +2960,7 @@ mod tests {
             background_color: None,
             underline: None,
             strikethrough: None,
+            letter_spacing: None,
         };
 
         let runs = vec![
@@ -2987,6 +2999,7 @@ mod tests {
             background_color: None,
             underline: None,
             strikethrough: None,
+            letter_spacing: None,
         };
         let runs = |lens: &[usize]| {
             lens.iter()
@@ -3066,6 +3079,7 @@ mod tests {
             background_color: None,
             underline: None,
             strikethrough: None,
+            letter_spacing: None,
         };
 
         let runs = vec![
