@@ -5,6 +5,9 @@ use gpui::{
     prelude::FluentBuilder as _, svg,
 };
 use gpui_component_macros::icon_named;
+// `Styled::text_color` takes `impl IntoColor<Hsla>`, and `IntoColor` lives in
+// `palette` rather than being re-exported by gpui.
+use palette::IntoColor;
 
 /// Types implementing this trait can automatically be converted to [`Icon`].
 ///
@@ -131,8 +134,8 @@ impl Styled for Icon {
         &mut self.style
     }
 
-    fn text_color(mut self, color: impl Into<Hsla>) -> Self {
-        self.text_color = Some(color.into());
+    fn text_color(mut self, color: impl IntoColor<Hsla>) -> Self {
+        self.text_color = Some(color.into_color());
         self
     }
 }

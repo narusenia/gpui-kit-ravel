@@ -55,6 +55,12 @@ gpui_platform = { package = "gpui_ce_platform", git = "https://github.com/naruse
 gpui_web = { package = "gpui_ce_web", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
 gpui_macros = { package = "gpui_ce_macros", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
 sum-tree = { package = "gpui_ce_sum_tree", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
+# `gpui::Hsla` is `palette::Hsla`, and traits such as `IntoColor` — which the
+# `Styled` signatures name — are not re-exported by gpui. Any crate that has to
+# spell one out depends on palette directly, at gpui's own version: a different
+# major.minor would make `palette::Hsla` a different type.
+palette = "0.7.6"
+
 # gpui-ce ships no reqwest-backed `HttpClient`, so `reqwest_client` has no
 # counterpart here; keeping the gpui-pre one would hand `App` a `HttpClient`
 # from the wrong crate. Consumers that need one supply it themselves.
