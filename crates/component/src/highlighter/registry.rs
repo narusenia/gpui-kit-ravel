@@ -219,6 +219,7 @@ impl From<FontWeightContent> for FontWeight {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
 pub struct ThemeStyle {
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     color: Option<Hsla>,
     font_style: Option<FontStyle>,
     font_weight: Option<FontWeightContent>,
@@ -312,34 +313,49 @@ impl SyntaxColors {
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
 pub struct StatusColors {
     #[serde(rename = "error")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     error: Option<Hsla>,
     #[serde(rename = "error.background")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     error_background: Option<Hsla>,
     #[serde(rename = "error.border")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     error_border: Option<Hsla>,
     #[serde(rename = "warning")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     warning: Option<Hsla>,
     #[serde(rename = "warning.background")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     warning_background: Option<Hsla>,
     #[serde(rename = "warning.border")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     warning_border: Option<Hsla>,
     #[serde(rename = "info")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     info: Option<Hsla>,
     #[serde(rename = "info.background")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     info_background: Option<Hsla>,
     #[serde(rename = "info.border")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     info_border: Option<Hsla>,
     #[serde(rename = "success")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     success: Option<Hsla>,
     #[serde(rename = "success.background")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     success_background: Option<Hsla>,
     #[serde(rename = "success.border")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     success_border: Option<Hsla>,
     #[serde(rename = "hint")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     hint: Option<Hsla>,
     #[serde(rename = "hint.background")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     hint_background: Option<Hsla>,
     #[serde(rename = "hint.border")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     hint_border: Option<Hsla>,
 }
 
@@ -433,20 +449,27 @@ impl StatusColors {
 #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, JsonSchema, Serialize, Deserialize)]
 pub struct HighlightThemeStyle {
     #[serde(rename = "editor.background")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub editor_background: Option<Hsla>,
     #[serde(rename = "editor.foreground")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub editor_foreground: Option<Hsla>,
     #[serde(rename = "editor.active_line.background")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub editor_active_line: Option<Hsla>,
     #[serde(rename = "editor.line_number")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub editor_line_number: Option<Hsla>,
     #[serde(rename = "editor.active_line_number")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub editor_active_line_number: Option<Hsla>,
     #[serde(rename = "editor.invisible")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub editor_invisible: Option<Hsla>,
     /// Optional background color for the gutter (line-number column).
     /// Falls back to [`Self::editor_background`] when unset.
     #[serde(rename = "editor.gutter.background")]
+    #[schemars(schema_with = "crate::json_schema::option_hsla_schemar")]
     pub editor_gutter_background: Option<Hsla>,
     #[serde(flatten)]
     pub status: StatusColors,

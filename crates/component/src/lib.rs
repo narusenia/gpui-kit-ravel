@@ -8,6 +8,7 @@ mod icon;
 mod index_path;
 #[cfg(any(feature = "inspector", debug_assertions))]
 mod inspector;
+mod json_schema;
 mod root;
 mod sizing;
 mod styled;

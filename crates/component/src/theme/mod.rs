@@ -124,6 +124,7 @@ pub struct Theme {
     /// which costs no space and cannot be clipped.
     #[serde(default = "default_true")]
     pub focus_ring: bool,
+    #[schemars(schema_with = "gpui::hsla_schemar")]
     pub transparent: Hsla,
     /// Show the scrollbar mode, default: Scrolling
     #[serde(alias = "scrollbar_show")]

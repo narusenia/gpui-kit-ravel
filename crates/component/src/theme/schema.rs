@@ -166,8 +166,11 @@ pub struct SemanticTypographyConfig {
 #[derive(Debug, Clone, Default, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct SemanticShadowConfig {
+    #[schemars(schema_with = "crate::json_schema::option_box_shadows_schemar")]
     pub sm: Option<Vec<BoxShadow>>,
+    #[schemars(schema_with = "crate::json_schema::option_box_shadows_schemar")]
     pub md: Option<Vec<BoxShadow>>,
+    #[schemars(schema_with = "crate::json_schema::option_box_shadows_schemar")]
     pub lg: Option<Vec<BoxShadow>>,
 }
 
