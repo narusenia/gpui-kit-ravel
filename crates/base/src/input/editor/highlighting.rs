@@ -1,6 +1,6 @@
 use std::{ops::Range, rc::Rc, sync::Arc};
 
-use gpui::{AnyElement, Context, HighlightStyle, Hsla, SharedString, Window};
+use gpui::{AnyElement, Context, HighlightStyle, Hsla, SharedString, Window, transparent_black};
 use ropey::Rope;
 
 use super::{EditorState, FoldRange, InputEdit};
@@ -59,12 +59,23 @@ pub type InputHighlighterFactory = Rc<dyn Fn(&str) -> Option<Box<dyn InputHighli
 pub type SharedHighlightStyleResolver = Arc<dyn HighlightStyleResolver>;
 pub type FoldIconRenderer = Rc<dyn Fn(usize, bool) -> AnyElement>;
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy)]
 pub struct DiagnosticColors {
     pub error: Hsla,
     pub warning: Hsla,
     pub info: Hsla,
     pub hint: Hsla,
+}
+
+impl Default for DiagnosticColors {
+    fn default() -> Self {
+        Self {
+            error: transparent_black(),
+            warning: transparent_black(),
+            info: transparent_black(),
+            hint: transparent_black(),
+        }
+    }
 }
 
 /// Application-owned colors and highlight resolver consumed by editor painting.
@@ -87,9 +98,9 @@ pub struct InputEditorStyle {
 impl InputEditorStyle {
     /// Fills in every colour that was left unset, from the active palette.
     ///
-    /// `Hsla::default()` is fully transparent, and every colour on `Default` is
-    /// that — so an input nothing projected onto painted its glyphs, its caret
-    /// and its selection in nothing at all. Transparent is not a colour anyone
+    /// Every colour on `Default` is fully transparent — so an input nothing
+    /// projected onto painted its glyphs, its caret and its selection in
+    /// nothing at all. Transparent is not a colour anyone
     /// means for ink, which is what makes it usable as "unset" here.
     ///
     /// This is resolution, not assignment: whatever a consumer did project is
@@ -125,12 +136,12 @@ impl InputEditorStyle {
 impl Default for InputEditorStyle {
     fn default() -> Self {
         Self {
-            foreground: Hsla::default(),
-            muted_foreground: Hsla::default(),
-            background: Hsla::default(),
-            border: Hsla::default(),
-            selection: Hsla::default(),
-            caret: Hsla::default(),
+            foreground: transparent_black(),
+            muted_foreground: transparent_black(),
+            background: transparent_black(),
+            border: transparent_black(),
+            selection: transparent_black(),
+            caret: transparent_black(),
             diagnostics: DiagnosticColors::default(),
             highlight_styles: Arc::new(NoHighlightStyles),
             editor_invisible: None,
@@ -176,14 +187,14 @@ mod tests {
             resolved.muted_foreground,
             resolved.selection,
         ] {
-            assert!(colour.a > 0., "{colour:?} is still invisible");
+            assert!(colour.alpha > 0., "{colour:?} is still invisible");
         }
     }
 
     #[test]
     fn a_selection_stays_translucent_enough_to_read_through() {
         let resolved = InputEditorStyle::default().resolved(&dark());
-        assert_eq!(resolved.selection.a, 0.4);
+        assert_eq!(resolved.selection.alpha, 0.4);
     }
 
     #[test]
