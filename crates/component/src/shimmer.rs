@@ -506,7 +506,7 @@ mod tests {
 
     #[test]
     fn test_shimmer_builder() {
-        let color = Hsla::white();
+        let color = gpui::white();
         let style = ShimmerStyle::new()
             .duration(Duration::from_secs(3))
             .highlight_color(color)
@@ -609,22 +609,22 @@ mod tests {
 
     #[test]
     fn test_shimmer_highlight_stays_bright_in_both_themes() {
-        let black = Hsla::black();
-        let white = Hsla::white();
+        let black = gpui::black();
+        let white = gpui::white();
         let muted = white.mix_oklab(black, 0.55);
         let light = shimmer_highlight_color(black, white, black, false, None);
         let dark = shimmer_highlight_color(muted, black, white, true, None);
 
-        assert!(light.l > black.l);
-        assert!(dark.l > muted.l);
-        assert!(light.a > dark.a);
-        assert!((1. - (1. - light.a).powi(SHIMMER_LAYER_COUNT as i32) - 0.75).abs() < 0.001);
-        assert!((1. - (1. - dark.a).powi(SHIMMER_LAYER_COUNT as i32) - 0.6).abs() < 0.001);
+        assert!(light.lightness > black.lightness);
+        assert!(dark.lightness > muted.lightness);
+        assert!(light.alpha > dark.alpha);
+        assert!((1. - (1. - light.alpha).powi(SHIMMER_LAYER_COUNT as i32) - 0.75).abs() < 0.001);
+        assert!((1. - (1. - dark.alpha).powi(SHIMMER_LAYER_COUNT as i32) - 0.6).abs() < 0.001);
 
         let custom = shimmer_highlight_color(black, white, black, false, Some(muted));
-        assert_eq!(custom.h, muted.h);
-        assert_eq!(custom.s, muted.s);
-        assert_eq!(custom.l, muted.l);
+        assert_eq!(custom.hue, muted.hue);
+        assert_eq!(custom.saturation, muted.saturation);
+        assert_eq!(custom.lightness, muted.lightness);
 
         let animation = loading_animation(Duration::from_secs(3), false);
         assert_eq!(animation.duration, Duration::from_secs(3));

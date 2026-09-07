@@ -1116,7 +1116,7 @@ impl Theme {
 
 #[cfg(test)]
 mod tests {
-    use gpui::{linear_color_stop, linear_gradient, px};
+    use gpui::{Hsla, linear_color_stop, linear_gradient, px};
 
     use crate::{Theme, ThemeConfig, ThemeMode, ThemeSet, try_parse_color};
 
@@ -1302,8 +1302,12 @@ mod tests {
 
         // Solid: representative color and rendered background both capped at 0.2.
         let blue = try_parse_color("#3b82f6").unwrap();
-        assert_eq!(theme.list_active, blue.alpha(0.2));
-        assert_eq!(theme.tokens.list_active.background, blue.alpha(0.2).into());
+        let with_alpha = |color: Hsla, alpha: f32| Hsla { alpha, ..color };
+        assert_eq!(theme.list_active, with_alpha(blue, 0.2));
+        assert_eq!(
+            theme.tokens.list_active.background,
+            with_alpha(blue, 0.2).into()
+        );
 
         // Gradient: the opaque `to` stop is clamped to 0.2, not left fully opaque.
         let faint = try_parse_color("#bfdbfe33").unwrap();
@@ -1311,8 +1315,8 @@ mod tests {
             theme.tokens.table_active.background,
             linear_gradient(
                 180.,
-                linear_color_stop(faint.alpha(faint.a.min(0.2)), 0.),
-                linear_color_stop(blue.alpha(0.2), 1.),
+                linear_color_stop(with_alpha(faint, faint.alpha.min(0.2)), 0.),
+                linear_color_stop(with_alpha(blue, 0.2), 1.),
             )
         );
 
@@ -1323,8 +1327,8 @@ mod tests {
             theme.tokens.selection.background,
             linear_gradient(
                 180.,
-                linear_color_stop(clear.alpha(clear.a.min(0.3)), 0.),
-                linear_color_stop(blue.alpha(0.3), 1.),
+                linear_color_stop(with_alpha(clear, clear.alpha.min(0.3)), 0.),
+                linear_color_stop(with_alpha(blue, 0.3), 1.),
             )
         );
     }

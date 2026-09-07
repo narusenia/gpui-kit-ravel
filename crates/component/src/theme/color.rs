@@ -957,46 +957,46 @@ mod tests {
 
     #[test]
     fn test_to_hex_string() {
-        let color: Hsla = rgb(0xf8fafc).into();
+        let color: Hsla = rgb_to_hsla(rgb(0xf8fafc));
         assert_eq!(color.to_hex(), "#F8FAFC");
 
-        let color: Hsla = rgb(0xfef2f2).into();
+        let color: Hsla = rgb_to_hsla(rgb(0xfef2f2));
         assert_eq!(color.to_hex(), "#FEF2F2");
 
-        let color: Hsla = rgba(0x0413fcaa).into();
+        let color: Hsla = rgb_to_hsla(rgba(0x0413fcaa));
         assert_eq!(color.to_hex(), "#0413FCAA");
     }
 
     #[test]
     fn test_from_hex_string() {
         let color: Hsla = Hsla::parse_hex("#F8FAFC").unwrap();
-        assert_eq!(color, rgb(0xf8fafc).into());
+        assert_eq!(color, rgb_to_hsla(rgb(0xf8fafc)));
 
         let color: Hsla = Hsla::parse_hex("#FEF2F2").unwrap();
-        assert_eq!(color, rgb(0xfef2f2).into());
+        assert_eq!(color, rgb_to_hsla(rgb(0xfef2f2)));
 
         let color: Hsla = Hsla::parse_hex("#0413FCAA").unwrap();
-        assert_eq!(color, rgba(0x0413fcaa).into());
+        assert_eq!(color, rgb_to_hsla(rgba(0x0413fcaa)));
     }
 
     #[test]
     fn test_lighten() {
         let color = super::hsl(240.0, 5.0, 30.0);
         let color = color.lighten(0.5);
-        assert_eq!(color.l, 0.45000002);
+        assert_eq!(color.lightness, 0.45000002);
         let color = color.lighten(0.5);
-        assert_eq!(color.l, 0.675);
+        assert_eq!(color.lightness, 0.675);
         let color = color.lighten(0.1);
-        assert_eq!(color.l, 0.7425);
+        assert_eq!(color.lightness, 0.7425);
     }
 
     #[test]
     fn test_darken() {
         let color = super::hsl(240.0, 5.0, 96.0);
         let color = color.darken(0.5);
-        assert_eq!(color.l, 0.48);
+        assert_eq!(color.lightness, 0.48);
         let color = color.darken(0.5);
-        assert_eq!(color.l, 0.24);
+        assert_eq!(color.lightness, 0.24);
     }
 
     #[test]
@@ -1015,28 +1015,23 @@ mod tests {
     fn test_mix_oklab() {
         let red = Hsla::parse_hex("#FF0000").unwrap();
         let blue = Hsla::parse_hex("#0000FF").unwrap();
-        let transparent = gpui::Hsla {
-            h: 0.0,
-            s: 0.0,
-            l: 0.0,
-            a: 0.0,
-        };
+        let transparent = gpui::transparent_black();
 
         // Test mixing red with transparent (similar to CSS color-mix example)
         // color-mix(in oklab, red 20%, transparent) should give red with 20% opacity
         let result = red.mix_oklab(transparent, 0.2);
-        assert!((result.a - 0.2).abs() < 0.01); // Alpha should be 20%
+        assert!((result.alpha - 0.2).abs() < 0.01); // Alpha should be 20%
 
         // The color should remain red (hue should be preserved)
-        let rgb_result = result.to_rgb();
-        let rgb_red = red.to_rgb();
+        let rgb_result = hsla_to_rgba(result);
+        let rgb_red = hsla_to_rgba(red);
         // Allow some tolerance due to color space conversions
         assert!(
-            (rgb_result.r - rgb_red.r).abs() < 0.05,
+            (rgb_result.red - rgb_red.red).abs() < 0.05,
             "Red channel should be preserved"
         );
-        assert!(rgb_result.g < 0.05, "Green channel should be near 0");
-        assert!(rgb_result.b < 0.05, "Blue channel should be near 0");
+        assert!(rgb_result.green < 0.05, "Green channel should be near 0");
+        assert!(rgb_result.blue < 0.05, "Blue channel should be near 0");
 
         // Test basic color mixing in Oklab space
         let purple = red.mix_oklab(blue, 0.5);
@@ -1049,17 +1044,17 @@ mod tests {
         let result_1 = red.mix_oklab(blue, 1.0);
 
         // Check that result is close to expected (within 1 color unit per channel)
-        let rgb_0 = result_0.to_rgb();
-        let rgb_blue = blue.to_rgb();
-        assert!((rgb_0.r - rgb_blue.r).abs() < 0.01);
-        assert!((rgb_0.g - rgb_blue.g).abs() < 0.01);
-        assert!((rgb_0.b - rgb_blue.b).abs() < 0.01);
+        let rgb_0 = hsla_to_rgba(result_0);
+        let rgb_blue = hsla_to_rgba(blue);
+        assert!((rgb_0.red - rgb_blue.red).abs() < 0.01);
+        assert!((rgb_0.green - rgb_blue.green).abs() < 0.01);
+        assert!((rgb_0.blue - rgb_blue.blue).abs() < 0.01);
 
-        let rgb_1 = result_1.to_rgb();
-        let rgb_red = red.to_rgb();
-        assert!((rgb_1.r - rgb_red.r).abs() < 0.01);
-        assert!((rgb_1.g - rgb_red.g).abs() < 0.01);
-        assert!((rgb_1.b - rgb_red.b).abs() < 0.01);
+        let rgb_1 = hsla_to_rgba(result_1);
+        let rgb_red = hsla_to_rgba(red);
+        assert!((rgb_1.red - rgb_red.red).abs() < 0.01);
+        assert!((rgb_1.green - rgb_red.green).abs() < 0.01);
+        assert!((rgb_1.blue - rgb_red.blue).abs() < 0.01);
     }
 
     #[test]

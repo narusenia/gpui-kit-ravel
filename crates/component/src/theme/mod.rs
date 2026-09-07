@@ -535,7 +535,10 @@ mod semantic_token_tests {
     #[test]
     fn semantic_colors_are_a_live_projection_of_legacy_fields() {
         let mut theme = Theme::default();
-        let primary = Hsla::default().alpha(0.42);
+        let primary = Hsla {
+            alpha: 0.42,
+            ..Default::default()
+        };
         theme.primary = primary;
 
         assert_eq!(theme.color_tokens().primary, primary);
@@ -547,8 +550,14 @@ mod semantic_token_tests {
         let mut theme = Theme::default();
         let component_color = theme.button_primary;
         let mut tokens = theme.semantic_tokens();
-        tokens.colors.primary = Hsla::default().alpha(0.25);
-        tokens.colors.destructive = Hsla::default().alpha(0.75);
+        tokens.colors.primary = Hsla {
+            alpha: 0.25,
+            ..Default::default()
+        };
+        tokens.colors.destructive = Hsla {
+            alpha: 0.75,
+            ..Default::default()
+        };
         tokens.radius.md = px(10.);
 
         theme.apply_semantic_tokens(&tokens);
@@ -786,10 +795,13 @@ mod base_theme_projection_tests {
             macro_rules! color {
                 ($field:ident) => {
                     assert!(
-                        (left.$field.h - right.$field.h).abs() < 1e-6
-                            && (left.$field.s - right.$field.s).abs() < 1e-6
-                            && (left.$field.l - right.$field.l).abs() < 1e-6
-                            && (left.$field.a - right.$field.a).abs() < 1e-6,
+                        (left.$field.hue.into_positive_degrees()
+                            - right.$field.hue.into_positive_degrees())
+                        .abs()
+                            < 1e-6
+                            && (left.$field.saturation - right.$field.saturation).abs() < 1e-6
+                            && (left.$field.lightness - right.$field.lightness).abs() < 1e-6
+                            && (left.$field.alpha - right.$field.alpha).abs() < 1e-6,
                         "{} differs: {:?} != {:?}",
                         stringify!($field),
                         left.$field,

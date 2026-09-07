@@ -410,22 +410,14 @@ mod tests {
 
     #[test]
     fn test_default_title_bar_background() {
-        let title_bar = Hsla::black();
-        let background = Hsla::white();
+        let title_bar = gpui::black();
+        let background = gpui::white();
 
         assert_eq!(
             default_title_bar_background(title_bar, background),
             linear_gradient(
                 180.,
-                linear_color_stop(
-                    Hsla::from(Rgba {
-                        r: 0.45,
-                        g: 0.45,
-                        b: 0.45,
-                        a: 1.,
-                    }),
-                    0.,
-                ),
+                linear_color_stop(rgb_to_hsla(Rgba::new(0.45, 0.45, 0.45, 1.)), 0.,),
                 linear_color_stop(title_bar, 1.),
             )
         );
