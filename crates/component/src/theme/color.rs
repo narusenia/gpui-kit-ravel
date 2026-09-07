@@ -1,7 +1,8 @@
 use std::{collections::HashMap, fmt::Display};
 
 use gpui::{
-    Background, Hsla, LinearColorStop, SharedString, hsla, linear_color_stop, linear_gradient,
+    Background, Hsla, LinearColorStop, SharedString, hsla, hsla_to_rgba, linear_color_stop,
+    linear_gradient, rgb_to_hsla,
 };
 use serde::{Deserialize, Deserializer, de::Error as _};
 
@@ -88,9 +89,9 @@ mod oklab {
     #[allow(non_snake_case)]
     pub fn rgb_to_oklab(rgb: Rgba) -> (f32, f32, f32) {
         // sRGB to linear RGB
-        let lr = to_linear(rgb.r);
-        let lg = to_linear(rgb.g);
-        let lb = to_linear(rgb.b);
+        let lr = to_linear(rgb.red);
+        let lg = to_linear(rgb.green);
+        let lb = to_linear(rgb.blue);
 
         // Linear RGB to LMS
         let l = 0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb;
@@ -127,65 +128,63 @@ mod oklab {
         let lb = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
 
         // Linear RGB to sRGB
-        Rgba {
-            r: from_linear(lr).clamp(0.0, 1.0),
-            g: from_linear(lg).clamp(0.0, 1.0),
-            b: from_linear(lb).clamp(0.0, 1.0),
-            a: 1.0,
-        }
+        Rgba::new(
+            from_linear(lr).clamp(0.0, 1.0),
+            from_linear(lg).clamp(0.0, 1.0),
+            from_linear(lb).clamp(0.0, 1.0),
+            1.0,
+        )
     }
 }
 
 impl Colorize for Hsla {
     fn opacity(&self, factor: f32) -> Self {
         Self {
-            a: self.a * factor.clamp(0.0, 1.0),
+            alpha: self.alpha * factor.clamp(0.0, 1.0),
             ..*self
         }
     }
 
     fn divide(&self, divisor: f32) -> Self {
         Self {
-            a: divisor,
+            alpha: divisor,
             ..*self
         }
     }
 
     fn invert(&self) -> Self {
-        Self {
-            h: 1.0 - self.h,
-            s: 1.0 - self.s,
-            l: 1.0 - self.l,
-            a: self.a,
-        }
+        let mut color = *self;
+        // The hue is stored in degrees, so its complement is 360 - h rather
+        // than 1 - h.
+        color.hue = (360.0 - self.hue.into_positive_degrees()).into();
+        color.saturation = 1.0 - self.saturation;
+        color.lightness = 1.0 - self.lightness;
+        color
     }
 
     fn invert_l(&self) -> Self {
-        Self {
-            l: 1.0 - self.l,
-            ..*self
-        }
+        let mut color = *self;
+        color.lightness = 1.0 - self.lightness;
+        color
     }
 
     fn lighten(&self, factor: f32) -> Self {
-        let l = self.l * (1.0 + factor.clamp(0.0, 1.0));
-
-        Hsla { l, ..*self }
+        let mut color = *self;
+        color.lightness = self.lightness * (1.0 + factor.clamp(0.0, 1.0));
+        color
     }
 
     fn darken(&self, factor: f32) -> Self {
-        let l = self.l * (1.0 - factor.clamp(0.0, 1.0));
-
-        Self { l, ..*self }
+        let mut color = *self;
+        color.lightness = self.lightness * (1.0 - factor.clamp(0.0, 1.0));
+        color
     }
 
     fn apply(&self, new_color: Self) -> Self {
-        Hsla {
-            h: new_color.h,
-            s: new_color.s,
-            l: self.l,
-            a: self.a,
-        }
+        let mut color = *self;
+        color.hue = new_color.hue;
+        color.saturation = new_color.saturation;
+        color
     }
 
     /// Reference:
@@ -200,12 +199,18 @@ impl Colorize for Hsla {
             (a + diff * t).rem_euclid(360.0)
         }
 
-        Hsla {
-            h: lerp_hue(self.h * 360., other.h * 360., factor) / 360.,
-            s: self.s * factor + other.s * inv,
-            l: self.l * factor + other.l * inv,
-            a: self.a * factor + other.a * inv,
-        }
+        let mut color = *self;
+        // `lerp_hue` already works in degrees, which is what `Hsla` stores.
+        color.hue = lerp_hue(
+            self.hue.into_positive_degrees(),
+            other.hue.into_positive_degrees(),
+            factor,
+        )
+        .into();
+        color.saturation = self.saturation * factor + other.saturation * inv;
+        color.lightness = self.lightness * factor + other.lightness * inv;
+        color.alpha = self.alpha * factor + other.alpha * inv;
+        color
     }
 
     #[allow(non_snake_case)]
@@ -214,21 +219,16 @@ impl Colorize for Hsla {
         let inv = 1.0 - factor;
 
         // Interpolate alpha first
-        let result_alpha = self.a * factor + other.a * inv;
+        let result_alpha = self.alpha * factor + other.alpha * inv;
 
         // Handle the case where result alpha is zero
         if result_alpha == 0.0 {
-            return Self {
-                h: 0.0,
-                s: 0.0,
-                l: 0.0,
-                a: 0.0,
-            };
+            return hsla(0.0, 0.0, 0.0, 0.0);
         }
 
         // Convert both colors to RGB
-        let rgb1 = self.to_rgb();
-        let rgb2 = other.to_rgb();
+        let rgb1 = hsla_to_rgba(*self);
+        let rgb2 = hsla_to_rgba(other);
 
         // Convert to Oklab color space
         let (l1, a1, b1) = oklab::rgb_to_oklab(rgb1);
@@ -236,8 +236,8 @@ impl Colorize for Hsla {
 
         // Premultiply alpha in Oklab space (using alpha-premultiplied interpolation)
         // This matches CSS color-mix behavior
-        let alpha1 = self.a;
-        let alpha2 = other.a;
+        let alpha1 = self.alpha;
+        let alpha2 = other.alpha;
 
         // Premultiply
         let l1_pm = l1 * alpha1;
@@ -260,69 +260,84 @@ impl Colorize for Hsla {
 
         // Convert back to RGB
         let mut rgb = oklab::oklab_to_rgb(L, a, b);
-        rgb.a = result_alpha;
+        rgb.alpha = result_alpha;
 
         // Convert RGB to HSLA
-        rgb.into()
+        rgb_to_hsla(rgb)
     }
 
     fn to_hex(&self) -> String {
-        let rgb = self.to_rgb();
+        let rgb = hsla_to_rgba(*self);
 
-        if rgb.a < 1. {
+        if rgb.alpha < 1. {
             return format!(
                 "#{:02X}{:02X}{:02X}{:02X}",
-                ((rgb.r * 255.) as u32),
-                ((rgb.g * 255.) as u32),
-                ((rgb.b * 255.) as u32),
-                ((self.a * 255.) as u32)
+                ((rgb.red * 255.) as u32),
+                ((rgb.green * 255.) as u32),
+                ((rgb.blue * 255.) as u32),
+                ((self.alpha * 255.) as u32)
             );
         }
 
         format!(
             "#{:02X}{:02X}{:02X}",
-            ((rgb.r * 255.) as u32),
-            ((rgb.g * 255.) as u32),
-            ((rgb.b * 255.) as u32)
+            ((rgb.red * 255.) as u32),
+            ((rgb.green * 255.) as u32),
+            ((rgb.blue * 255.) as u32)
         )
     }
 
+    /// Parses `#rgb`, `#rgba`, `#rrggbb`, and `#rrggbbaa`, with or without
+    /// the `#`.
     fn parse_hex(hex: &str) -> Result<Self> {
         let hex = hex.trim_start_matches('#');
-        let len = hex.len();
-        if len != 6 && len != 8 {
-            return Err(anyhow::anyhow!("invalid hex color"));
+        // `from_str_radix` accepts a leading sign, so reject anything that is
+        // not purely hexadecimal before slicing components out of it.
+        if !hex.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+            return Err(anyhow!("invalid hex color"));
         }
 
-        let r = u8::from_str_radix(&hex[0..2], 16)? as f32 / 255.;
-        let g = u8::from_str_radix(&hex[2..4], 16)? as f32 / 255.;
-        let b = u8::from_str_radix(&hex[4..6], 16)? as f32 / 255.;
-        let a = if len == 8 {
-            u8::from_str_radix(&hex[6..8], 16)? as f32 / 255.
-        } else {
-            1.
+        let (width, has_alpha) = match hex.len() {
+            3 => (1, false),
+            4 => (1, true),
+            6 => (2, false),
+            8 => (2, true),
+            _ => return Err(anyhow!("invalid hex color")),
         };
 
-        let v = gpui::Rgba { r, g, b, a };
-        let color: Hsla = v.into();
-        Ok(color)
+        let component = |index: usize| -> Result<f32> {
+            let start = index * width;
+            let raw = u8::from_str_radix(&hex[start..start + width], 16)?;
+            // A single digit repeats itself rather than scaling, so `#fff` is
+            // white.
+            let raw = if width == 1 { raw * 0x11 } else { raw };
+            Ok(raw as f32 / 255.)
+        };
+
+        Ok(rgb_to_hsla(gpui::Rgba::new(
+            component(0)?,
+            component(1)?,
+            component(2)?,
+            if has_alpha { component(3)? } else { 1. },
+        )))
     }
 
     fn hue(&self, hue: f32) -> Self {
         let mut color = *self;
-        color.h = hue.clamp(0., 1.);
+        // The argument is a 0..1 fraction of the circle; `Hsla` stores degrees.
+        color.hue = (hue.clamp(0., 1.) * 360.).into();
         color
     }
 
     fn saturation(&self, saturation: f32) -> Self {
         let mut color = *self;
-        color.s = saturation.clamp(0., 1.);
+        color.saturation = saturation.clamp(0., 1.);
         color
     }
 
     fn lightness(&self, lightness: f32) -> Self {
         let mut color = *self;
-        color.l = lightness.clamp(0., 1.);
+        color.lightness = lightness.clamp(0., 1.);
         color
     }
 }
@@ -493,7 +508,7 @@ impl ColorName {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize)]
+#[derive(Debug, Clone, PartialEq, serde::Deserialize)]
 pub(crate) struct ShadcnColors {
     pub(crate) black: ShadcnColor,
     pub(crate) white: ShadcnColor,
@@ -543,7 +558,7 @@ pub(crate) struct ShadcnColors {
     pub(crate) rose: ColorScales,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, serde::Deserialize)]
 pub(crate) struct ShadcnColor {
     #[serde(default)]
     pub(crate) scale: usize,
@@ -676,8 +691,7 @@ color_methods!(rose);
 ///
 pub fn try_parse_color(color: &str) -> Result<Hsla> {
     if color.starts_with("#") {
-        let rgba = gpui::Rgba::try_from(color)?;
-        return Ok(rgba.into());
+        return Hsla::parse_hex(color);
     }
 
     let mut name = String::new();
@@ -759,14 +773,18 @@ pub fn try_parse_background(background: &str) -> Result<Background> {
 /// this caps each gradient stop independently, so a bright `to` stop (or a
 /// transparent `from` stop) can never push the rendered highlight past `max`.
 pub(crate) fn try_parse_background_clamped(background: &str, max: f32) -> Result<Background> {
+    let clamp_alpha = |color: Hsla| Hsla {
+        alpha: color.alpha.min(max),
+        ..color
+    };
+
     if let Ok(color) = try_parse_color(background) {
-        return Ok(color.alpha(color.a.min(max)).into());
+        return Ok(clamp_alpha(color).into());
     }
 
     let gradient = parse_linear_gradient(background)?;
-    let clamp = |stop: LinearColorStop| {
-        linear_color_stop(stop.color.alpha(stop.color.a.min(max)), stop.percentage)
-    };
+    let clamp =
+        |stop: LinearColorStop| linear_color_stop(clamp_alpha(stop.color.into()), stop.percentage);
     Ok(linear_gradient(
         gradient.angle,
         clamp(gradient.from),
@@ -779,7 +797,7 @@ pub(crate) fn try_parse_theme_color(color: &str) -> Result<Hsla> {
         return Ok(color);
     }
 
-    Ok(parse_linear_gradient(color)?.from.color)
+    Ok(parse_linear_gradient(color)?.from.color.into())
 }
 
 struct ParsedLinearGradient {
