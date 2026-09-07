@@ -253,7 +253,9 @@ pub(crate) trait ManagedTooltipExt:
         let trigger_bounds_cell: Rc<Cell<Bounds<Pixels>>> = Rc::new(Cell::new(Bounds::default()));
         let bounds_writer = trigger_bounds_cell.clone();
 
-        self.on_prepaint(move |bounds, _, _| {
+        // `Stateful` now carries gpui's own `on_prepaint`, so name the one
+        // this crate means.
+        crate::ElementExt::on_prepaint(self, move |bounds, _, _| {
             bounds_writer.set(bounds);
         })
         .on_hover({

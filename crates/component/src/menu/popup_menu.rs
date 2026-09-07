@@ -1462,7 +1462,13 @@ impl Render for PopupMenu {
                             .filter(|(ix, item)| !(*ix + 1 == items_count && item.is_separator()))
                             .map(|(ix, item)| self.render_item(ix, item, options, window, cx)),
                     )
-                    .on_prepaint(move |bounds, _, cx| view.update(cx, |r, _| r.bounds = bounds)),
+                    // `Stateful` now carries gpui's own `on_prepaint`, so name
+                    // the one this crate means.
+                    .map(|this| {
+                        ElementExt::on_prepaint(this, move |bounds, _, cx| {
+                            view.update(cx, |r, _| r.bounds = bounds)
+                        })
+                    }),
             )
             .when(self.scrollable, |this| {
                 // TODO: When the menu is limited by `overflow_y_scroll`, the sub-menu will cannot be displayed.

@@ -10,7 +10,7 @@ use gpui::{
 use rust_i18n::t;
 
 use crate::{
-    ActiveTheme as _, ElementExt as _, Icon, IconName, IndexPath, StyledExt as _,
+    ActiveTheme as _, ElementExt, Icon, IconName, IndexPath, StyledExt as _,
     VirtualListScrollHandle,
     actions::{Cancel, Confirm, SelectDown, SelectUp},
     command::{
@@ -864,38 +864,42 @@ impl Render for CommandState {
                     // surrounding dividers; only the empty slot needs the
                     // container padding.
                     .when(rows_count == 0, |this| this.p_1())
-                    .on_prepaint({
-                        let measure_state = command_state.clone();
-                        move |bounds, window, cx| {
-                            measure_state.update(cx, |state, cx| {
-                                // The list's `p_1` is one quarter rem on each
-                                // side. Its rem-dependent padding and inherited
-                                // layout-relevant text style participate in
-                                // the row-size cache key.
-                                let text_style = window.text_style();
-                                state.set_list_measurement_key(
-                                    ListMeasurementKey {
-                                        content_width: (bounds.size.width
-                                            - window.rem_size() * 0.5)
-                                            .max(px(0.)),
-                                        rem_size: window.rem_size(),
-                                        line_height: window.line_height(),
-                                        text_shape: TextShapeKey {
-                                            font_family: text_style.font_family,
-                                            font_features: text_style.font_features,
-                                            font_fallbacks: text_style.font_fallbacks,
-                                            font_size: text_style.font_size,
-                                            font_weight: text_style.font_weight,
-                                            font_style: text_style.font_style,
-                                            white_space: text_style.white_space,
-                                            text_overflow: text_style.text_overflow,
-                                            line_clamp: text_style.line_clamp,
+                    // `Stateful` now carries gpui's own `on_prepaint`, so
+                    // name the one this crate means.
+                    .map(|this| {
+                        ElementExt::on_prepaint(this, {
+                            let measure_state = command_state.clone();
+                            move |bounds, window, cx| {
+                                measure_state.update(cx, |state, cx| {
+                                    // The list's `p_1` is one quarter rem on each
+                                    // side. Its rem-dependent padding and inherited
+                                    // layout-relevant text style participate in
+                                    // the row-size cache key.
+                                    let text_style = window.text_style();
+                                    state.set_list_measurement_key(
+                                        ListMeasurementKey {
+                                            content_width: (bounds.size.width
+                                                - window.rem_size() * 0.5)
+                                                .max(px(0.)),
+                                            rem_size: window.rem_size(),
+                                            line_height: window.line_height(),
+                                            text_shape: TextShapeKey {
+                                                font_family: text_style.font_family,
+                                                font_features: text_style.font_features,
+                                                font_fallbacks: text_style.font_fallbacks,
+                                                font_size: text_style.font_size,
+                                                font_weight: text_style.font_weight,
+                                                font_style: text_style.font_style,
+                                                white_space: text_style.white_space,
+                                                text_overflow: text_style.text_overflow,
+                                                line_clamp: text_style.line_clamp,
+                                            },
                                         },
-                                    },
-                                    cx,
-                                )
-                            })
-                        }
+                                        cx,
+                                    )
+                                })
+                            }
+                        })
                     })
                     .max_h(self.options.max_h)
                     .overflow_hidden()

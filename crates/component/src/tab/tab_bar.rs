@@ -509,7 +509,9 @@ impl RenderOnce for TabBar {
                                 this.track_scroll(&scroll_handle)
                             })
                             .when_some(bounds_rc.clone(), |this, rc| {
-                                this.on_prepaint(move |bounds, _, _| {
+                                // `Stateful` now carries gpui's own
+                                // `on_prepaint`, so name this crate's.
+                                ElementExt::on_prepaint(this, move |bounds, _, _| {
                                     rc.borrow_mut().container = bounds;
                                 })
                             })

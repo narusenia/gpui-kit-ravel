@@ -20,7 +20,7 @@ use crate::{
 };
 
 use super::calendar::{Calendar, CalendarEvent, CalendarState, Date, Matcher};
-use gpui_base::{DatePicker as BaseDatePicker, ElementExt as _};
+use gpui_base::{DatePicker as BaseDatePicker, ElementExt};
 
 const CONTEXT: &'static str = "DatePicker";
 pub(crate) fn init(cx: &mut App) {
@@ -419,9 +419,13 @@ impl RenderOnce for DatePicker {
             .flex_none()
             .w_full()
             .relative()
-            .on_prepaint({
-                let state = self.state.clone();
-                move |bounds, _, cx| state.update(cx, |state, _| state.bounds = bounds)
+            // `Stateful` now carries gpui's own `on_prepaint`, so name the
+            // one this crate means.
+            .map(|this| {
+                ElementExt::on_prepaint(this, {
+                    let state = self.state.clone();
+                    move |bounds, _, cx| state.update(cx, |state, _| state.bounds = bounds)
+                })
             })
             .input_text_size(self.size)
             .refine_style(&self.style)
