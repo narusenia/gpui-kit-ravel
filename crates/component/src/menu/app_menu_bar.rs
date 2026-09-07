@@ -13,7 +13,16 @@ use gpui::{
     deferred, div, prelude::FluentBuilder, px,
 };
 
-const CONTEXT: &str = "AppMenuBar";
+/// The key context the application menu bar installs while it is open.
+///
+/// Public for the same reason as
+/// [`POPUP_MENU_CONTEXT`](crate::menu::POPUP_MENU_CONTEXT): a host that
+/// scopes a binding as `Workspace && !AppMenuBar` should name the context
+/// rather than repeat the literal.
+pub const APP_MENU_BAR_CONTEXT: &str = "AppMenuBar";
+
+const CONTEXT: &str = APP_MENU_BAR_CONTEXT;
+
 pub fn init(cx: &mut App) {
     cx.bind_keys([
         KeyBinding::new("escape", Cancel, Some(CONTEXT)),

@@ -15,7 +15,15 @@ use gpui::{ClickEvent, Half, MouseDownEvent, OwnedMenuItem, Point, Subscription}
 
 use std::rc::Rc;
 
-const CONTEXT: &str = "PopupMenu";
+/// The key context a popup menu installs while it is open.
+///
+/// Public so a host can scope its own bindings out of the way: a binding
+/// written as `Workspace && !PopupMenu` stops firing while the menu has
+/// focus. Without the name a host has to repeat the literal, and the two
+/// drift apart with nothing to catch it.
+pub const POPUP_MENU_CONTEXT: &str = "PopupMenu";
+
+const CONTEXT: &str = POPUP_MENU_CONTEXT;
 
 pub fn init(cx: &mut App) {
     cx.bind_keys([
