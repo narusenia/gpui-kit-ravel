@@ -116,7 +116,7 @@ use gpui::{
     StatefulInteractiveElement, StyleRefinement, Styled, Window, div,
 };
 use gpui_base::{
-    Button, Checkbox, CheckboxState, ElementExt as _, Link, ScrollbarAxis, Switch, TextView,
+    Button, Checkbox, CheckboxState, ElementExt, Link, ScrollbarAxis, Switch, TextView,
     TextViewStyle, Theme,
     animation::{ease_in_cubic, ease_in_out_cubic, ease_out_cubic},
     h_flex,
@@ -2029,7 +2029,10 @@ fn flex_element(
     }
     let bounds = Rc::new(Cell::new(None::<Bounds<Pixels>>));
     let bounds_writer = Rc::clone(&bounds);
-    let mut stateful = stateful.on_prepaint(move |value, _, _| bounds_writer.set(Some(value)));
+    // `Stateful` now carries gpui's own `on_prepaint`, so name the one this
+    // crate means.
+    let mut stateful =
+        ElementExt::on_prepaint(stateful, move |value, _, _| bounds_writer.set(Some(value)));
     if let Some(callback) = behavior.on_mouse_move {
         let runtime = Rc::downgrade(runtime);
         let bounds = Rc::clone(&bounds);

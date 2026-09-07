@@ -840,7 +840,7 @@ fn paint_selection(layout: &gpui::TextLayout, range: Range<usize>, window: &mut 
             Point::new(end.x, end.y + line_height),
         ));
     }
-    let color = token("primary", ColorTokens::default().primary).opacity(0.28);
+    let color = gpui::ColorExt::opacity(&token("primary", ColorTokens::default().primary), 0.28);
     for bounds in quads {
         window.paint_quad(PaintQuad {
             bounds,

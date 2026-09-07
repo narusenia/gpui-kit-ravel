@@ -373,9 +373,9 @@ fn json_string(value: &str) -> String {
 }
 
 fn hex(color: gpui::Hsla) -> String {
-    let c = gpui::Rgba::from(color);
+    let c = gpui::hsla_to_rgba(color);
     let b = |v: f32| (v.clamp(0., 1.) * 255.).round() as u8;
-    format!("#{:02x}{:02x}{:02x}", b(c.r), b(c.g), b(c.b))
+    format!("#{:02x}{:02x}{:02x}", b(c.red), b(c.green), b(c.blue))
 }
 
 #[cfg(test)]

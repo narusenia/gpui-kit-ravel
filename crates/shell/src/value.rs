@@ -104,7 +104,7 @@ fn parse_hex(hex: &str) -> Option<Hsla> {
         _ => return None,
     };
 
-    Some(rgba(rgba_value).into())
+    Some(gpui::rgb_to_hsla(rgba(rgba_value)))
 }
 
 /// Reads the positional arguments of a bound method.
