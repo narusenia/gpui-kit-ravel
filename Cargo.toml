@@ -50,11 +50,11 @@ story = { path = "crates/story" }
 
 # The `gpui` family comes from the gpui-ce fork carrying Ravel's patches.
 # Pinned by rev, not branch: the branch still moves.
-gpui = { package = "gpui-ce", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
-gpui_platform = { package = "gpui_ce_platform", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7", features = ["font-kit", "x11", "wayland", "runtime_shaders"] }
-gpui_web = { package = "gpui_ce_web", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
-gpui_macros = { package = "gpui_ce_macros", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
-sum-tree = { package = "gpui_ce_sum_tree", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "a93d6ccd0ae1d62688417bd61c66833ed5411ee7" }
+gpui = { package = "gpui-ce", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "7a52224f18c05748409f08f14f2de2a1bbc4ccbb" }
+gpui_platform = { package = "gpui_ce_platform", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "7a52224f18c05748409f08f14f2de2a1bbc4ccbb", features = ["font-kit", "x11", "wayland", "runtime_shaders"] }
+gpui_web = { package = "gpui_ce_web", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "7a52224f18c05748409f08f14f2de2a1bbc4ccbb" }
+gpui_macros = { package = "gpui_ce_macros", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "7a52224f18c05748409f08f14f2de2a1bbc4ccbb" }
+sum-tree = { package = "gpui_ce_sum_tree", git = "https://github.com/narusenia/gpui-ce-ravel.git", rev = "7a52224f18c05748409f08f14f2de2a1bbc4ccbb" }
 # `gpui::Hsla` is `palette::Hsla`, and traits such as `IntoColor` — which the
 # `Styled` signatures name — are not re-exported by gpui. Any crate that has to
 # spell one out depends on palette directly, at gpui's own version: a different
